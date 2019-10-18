@@ -1,0 +1,5 @@
+run this command to compile and run:
+g++ -std=c++11 ordering_function.cpp -o ordering_function && ./ordering_function
+
+or if you want to only run: 
+./ordering_function
