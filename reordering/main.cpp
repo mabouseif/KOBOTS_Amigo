@@ -118,7 +118,7 @@ int main(int argc, char** agrv)
     std::cout << "Running.." << std::endl;
 
 
-    std::vector<line> reorderd_sequence = reorder_cuts(upper_left_corner_mirrored_L_shape);
+    std::vector<line> reorderd_sequence = reorder_cuts(square);
 
 
     return 0;
