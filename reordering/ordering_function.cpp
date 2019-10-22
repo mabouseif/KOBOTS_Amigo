@@ -1,55 +1,23 @@
-#include <stdio.h>
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-#include <bits/stdc++.h> 
-#include <algorithm>
+#include "ordering_function.h"
 
-/* The point struct has an extra operator == function because it is required 
- when creating unordered maps with custom classes/structs
- Also the function hash_fn is part of it. Check the links for more info */
-struct point
-{
-    int x;
-    int y;
-
-    // https://www.techiedelight.com/use-struct-key-std-unordered_map-cpp/
-    // https://stackoverflow.com/questions/17016175/c-unordered-map-using-a-custom-class-type-as-the-key
-    bool operator==(const point &other) const
-    { 
-        return (x == other.x && y == other.y);
-    }
-
-};
+/*
+    Things to remember:
+    1- Many horizontal lines case.
+    2- Receiving a line with the same point as vertices.
+    3- Should fix permutations to include per-line-permutation in order
+    to handle the case where a line is horizontal and could be cut in either
+    direction. That would make the cost calculation more inclusive and the
+    solution more optimal.
+    4- Change the permutations from an array to a vector
+*/
 
 
-struct line
-{
-    point p1;
-    point p2;
+struct point p;
 
-};
+struct line l;
 
+struct hash_fn h;
 
-/////////////////////////////////////////////////////////////////////////////
-////////////////////////////// Polygon-related start ////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-
-
-// specialized hash function for unordered_map keys, for the point struct
-struct hash_fn
-{
-	// https://www.techiedelight.com/use-struct-key-std-unordered_map-cpp/
-    // https://stackoverflow.com/questions/17016175/c-unordered-map-using-a-custom-class-type-as-the-key
-    
-	std::size_t operator()(const point &p) const
-	{
-		std::size_t h1 = std::hash<int>()(p.x);
-		std::size_t h2 = std::hash<int>()(p.y);
-
-		return h1 ^ h2;
-	}
-};
 
 
 void print_map(std::unordered_map<point,int, hash_fn> const &m)
@@ -176,7 +144,7 @@ std::vector<int> get_index_of_final_line_and_starting_vertex(std::vector<line> l
         }
     }
 
-    std::cout << "line_idx size: " << line_idx.size() << std::endl;
+    std::cout << "line indices size corresponding to lines with the highest y-value : " << line_idx.size() << std::endl;
 
     // Counting the number of occurences of lines and keeping track of the index
     // in order to access the point later
@@ -222,7 +190,7 @@ std::vector<int> get_index_of_final_line_and_starting_vertex(std::vector<line> l
                 line_and_pt_idx_vec.push_back(point_idx[pair.second[1]]);
 
                 std::cout << "Flat case" << std::endl;
-                std::cout << "Note: Flat case is adding an extra element to the line_idx vector. Look into that." << std::endl;
+                std::cout << "Note: Flat case is adding an extra element to the line_idx vector because one of the lines is repeated due to reccuring." << std::endl;
 
                 return line_and_pt_idx_vec; 
             }
@@ -316,8 +284,6 @@ int get_factorial(unsigned int n)
 { 
     unsigned long long factorial = 1;
     // unsigned int n;
-    // cout << "Enter a positive integer: ";
-    // cin >> n;
     for(int i = 1; i <=n; ++i)
     {
         factorial *= i;
@@ -336,17 +302,17 @@ void display(int a[], int n)
     std::cout << std::endl; 
 } 
   
-// Function to find the permutations 
+// Function to find the permutations of a given array
 int** findPermutations(int a[], int n_elements, unsigned long long n_perms) 
 { 
-    std::cout << n_perms << " and " << n_elements << std::endl;
+    std::cout << "Number of permutations: " << n_perms << "\nNumber of elements: " << n_elements << std::endl;
     // Sort the given array 
     // sort(a, a + n); 
     bool stop_condition = true;
     int count = 0;
     // int perms [n_perms][n_elements];
     int** perms = (int**)malloc(n_perms * sizeof(int*));
-    for (int i = 0; i < n_perms; i++)
+    for (unsigned long long i = 0; i < n_perms; i++)
         perms[i] = (int *)malloc(n_elements * sizeof(int));
 
     // Find all possible permutations 
@@ -381,21 +347,32 @@ void print_perms(int** perms, int count, int n_elements)
 
 double euc_dist(line l1, line l2)
 {
-    return std::sqrt((l1.p2.x - l2.p1.x)^2 + (l1.p2.y - l2.p1.y)^2);
+    
+    double x_diff = l1.p2.x - l2.p1.x;
+    double y_diff = l1.p2.y - l2.p1.y;
+    auto term1 = pow(x_diff, 2);
+    auto term2 = pow(y_diff, 2);
+    return std::sqrt(term1 + term2);
 }
 
-size_t get_cost_arr(int** perms, int n_perms, int n_elements, std::vector<line> line_set)
+size_t get_cost_arr(int** perms, unsigned long long n_perms, int n_elements, std::vector<line> line_set)
 {
+    /*
+        Should also append all indices of permutations that are resulting 
+        in minimum cost and pick the one that would be more optimal when
+        trying to optimize for multiple polygons at the same time.
+    */
 
-    double* cost_arr = (double*)malloc(n_perms * sizeof(double));
-    double min_cost = DBL_MAX;
+    float* cost_arr = (float*)malloc(n_perms * sizeof(float));
+    float min_cost = FLT_MAX;
     size_t min_idx;
-    for (size_t i = 0; i < n_perms; i++)
+    for (unsigned long long i = 0; i < n_perms; i++)
     {
         for (int j = 0; j < n_elements-1; j++)
         {
             cost_arr[i] += euc_dist(line_set[perms[i][j]], line_set[perms[i][j+1]]);
         }
+        // std::cout << "cost: " << cost_arr[i] << std::endl;
         
         if (cost_arr[i] < min_cost)
         {
@@ -412,8 +389,17 @@ size_t get_cost_arr(int** perms, int n_perms, int n_elements, std::vector<line> 
 
 
 
-void rearrange_points(std::vector<line> &line_set)
+void reorder_points(std::vector<line>& line_set)
 {
+    /*
+        Reorders points of lines so that lines would have p1
+        as the one with a higher y-value.
+        If y-values are the same and assuming the line does not have
+        both vertices as the same point, make the line have the first/entry
+        point as the one with the bigger x-value
+    */
+    line temp_line;
+    std::vector<line> new_lines;
     point temp_point;
     for (int i = 0; i < line_set.size(); i++)
     {
@@ -426,10 +412,80 @@ void rearrange_points(std::vector<line> &line_set)
             line_set[i].p1 = line_set[i].p2;
             line_set[i].p2 = temp_point;
         }
+        // else if (y1 == y2)
+        // {
+        //     // make sure you are not copying by REFERENCE
+        //     temp_line = line_set[i];
+        //     temp_point = temp_line.p1;
+        //     temp_line.p1 = temp_line.p2;
+        //     temp_line.p2 = temp_point;
+
+        //     new_lines.push_back(temp_line);
+        // }
+        // line_set.insert(line_set.end(), new_lines.begin(), new_lines.end());
+
+        else if (y1 == y2)
+        {
+            int x1 = line_set[i].p1.x;
+            int x2 = line_set[i].p2.x;
+            if (x1 < x2)
+            {
+                temp_point = line_set[i].p1;
+                line_set[i].p1 = line_set[i].p2;
+                line_set[i].p2 = temp_point;
+            }    
+        }
+
     }
+
+    
+
 }
 
 
+std::vector<line> reorder_cuts(std::vector<line> line_set)
+{
+    std::vector<line> reordered_lines;
+    std::vector<int> final_idx_vec = get_index_of_final_line_and_starting_vertex(line_set);
+    int final_line_idx = final_idx_vec[0];
+    int final_line_starting_vertex_index = final_idx_vec[1];
+    std::cout << "Final line index: " << final_line_idx << std::endl;
+
+    line final_line = line_set[final_line_idx];
+    line_set.erase(line_set.begin() + final_line_idx);
+
+    reorder_points(line_set);
+
+    int a[line_set.size()] = {};
+    for (int i = 0; i < line_set.size(); i++)
+        a[i] = i;
+
+    int n_elements = sizeof(a) / sizeof(a[0]);
+
+    unsigned long long n_perms = get_factorial(n_elements);
+
+    clock_t begin = std::clock();
+    int** perms = findPermutations(a, n_elements, n_perms); 
+    clock_t end = std::clock();
+    std::cout << "Elapsed time for finding permutations: " << double(end-begin)/ CLOCKS_PER_SEC << std::endl;
+
+    begin = std::clock();
+    size_t min_idx = get_cost_arr(perms, n_perms, n_elements, line_set);
+    end = std::clock();
+    std::cout << "Elapsed time for calculating cost of all permutations and finding the minimum value index: " << double(end-begin)/ CLOCKS_PER_SEC << std::endl;
+
+    for (int i = 0; i< n_elements; i++)
+        reordered_lines.push_back(line_set[perms[min_idx][i]]);
+
+    reordered_lines.push_back(final_line);
+
+    for (int i = 0; i < n_elements; i++)
+        std::cout << perms[min_idx][i] << " ";
+    std::cout << final_line_idx << std::endl;
+
+    return reordered_lines;
+
+}
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -445,7 +501,7 @@ void rearrange_points(std::vector<line> &line_set)
 /////////////////////////////////////////////////////////////////////////////
 ////////////////////////////// Main /////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
-
+/*
 int main(int argc, char** argv)
 {
     // This is here because "true" and "false" are printed out as 1 and 0, whereas this fixes it.
@@ -471,6 +527,11 @@ int main(int argc, char** argv)
     line l5;
     line l6;
     line l7;
+    line l8;
+    line l9;
+    line l10;
+    line l11;
+    line l12;
 
     square.push_back(l1);
     square.push_back(l2);
@@ -491,7 +552,13 @@ int main(int argc, char** argv)
     point p14 = {3, 5};
     point p15 = {4, 3};
     point p16 = {5, 5};
-    point p17 = {6, 0};
+    point p17 = {6, 3};
+    point p18 = {7, 5};
+    point p19 = {8, 3};
+    point p20 = {9, 5};
+    point p21 = {10, 0};
+    point p22 = {11, 5};
+    point p23 = {12, 0};
 
     l1 = {p11, p12};
     l2 = {p12, p13};
@@ -499,7 +566,12 @@ int main(int argc, char** argv)
     l4 = {p14, p15};
     l5 = {p15, p16};
     l6 = {p16, p17};
-    l7 = {p17, p11};
+    l7 = {p17, p18};
+    l8 = {p18, p19};
+    l9 = {p19, p20};
+    l10 = {p20, p21};
+    l11 = {p21, p11};
+    l12 = {p22, p23};
 
     kings_crown.push_back(l1);
     kings_crown.push_back(l2);
@@ -508,6 +580,11 @@ int main(int argc, char** argv)
     kings_crown.push_back(l5);
     kings_crown.push_back(l6);
     kings_crown.push_back(l7);
+    kings_crown.push_back(l8);
+    kings_crown.push_back(l9);
+    kings_crown.push_back(l10);
+    kings_crown.push_back(l11);
+    // kings_crown.push_back(l12);
 
     p1 = {0, 5};
     p2 = {2, 5};
@@ -570,7 +647,10 @@ int main(int argc, char** argv)
     ///////////////////////////////////////////////////////////
 
     std::vector<line> shape = kings_crown;
-
+    std::cout << "Old size of shape: " << shape.size() << std::endl;
+    reorder_points(shape);
+    std::cout << "New size of shape: " << shape.size() << std::endl;
+    
     // Let's say we have a vector of lines (n_elements)
     int a[shape.size()] = {};
     for (int i = 0; i < shape.size(); i++)
@@ -593,12 +673,17 @@ int main(int argc, char** argv)
 
     // print_perms(perms, n_perms, n_elements);
 
-    
 
-    rearrange_points(shape);
+    // reorder_points(shape);
+    // // std::cout << "New size of shape: " << shape.size() << std::endl;
+
+    begin = std::clock();
 
     size_t min_idx = get_cost_arr(perms, n_perms, n_elements, shape);
     std::cout << "Minimum Permutation index: " << min_idx << std::endl;
+
+    end = std::clock();
+    std::cout << "Elapsed time for calculating cost of all permutations and finding the minimum value index: " << double(end-begin)/ CLOCKS_PER_SEC << std::endl;
 
     for (int i = 0; i < n_elements; i++)
         std::cout << perms[min_idx][i] << " ";
@@ -607,5 +692,4 @@ int main(int argc, char** argv)
 
     return 0;
 }
-
-
+*/
