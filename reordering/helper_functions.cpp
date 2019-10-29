@@ -1,4 +1,4 @@
-#include "ordering_function.h"
+#include "helper_functions.h"
 
 /*
     Things to remember:
@@ -7,8 +7,9 @@
     3- Should fix permutations to include per-line-permutation in order
     to handle the case where a line is horizontal and could be cut in either
     direction. That would make the cost calculation more inclusive and the
-    solution more optimal.
-    4- Change the permutations from an array to a vector
+    solution more optimal, but it's way more costly.
+    4- Change the permutations from an array to a vector.
+    5- Memory leak check with valgrind for malloc usage.
 */
 
 
@@ -274,6 +275,50 @@ std::vector<int> get_index_of_final_line_and_starting_vertex(std::vector<line> l
 
 
 
+/////////////////////////////////////////////////////////////////////////////
+////////////////////////////// Stacked Horizontal lines-related start /////////
+/////////////////////////////////////////////////////////////////////////////
+
+bool is_single_line_polygon_and_board_wide(std::vector<line> line_set, const int board_width)
+{
+    if (line_set.size() == 1 && std::abs(line_set[0].p1.x - line_set[0].p2.x) == board_width)
+        return true;
+    return false;
+}
+
+std::vector<int> get_single_line_polygon_indices(std::vector<std::vector<line>> poly_set, const int board_width)
+{
+    std::vector<int> idx;
+    for (int i = 0; i < poly_set.size(); i++)
+        if (is_single_line_polygon_and_board_wide(poly_set[i], board_width))
+            idx.push_back(i);
+    return idx;
+}
+
+std::vector<std::vector<line>> get_single_line_polygons(std::vector<std::vector<line>> poly_set, std::vector<int> idx)
+{
+    std::vector<std::vector<line>> single_polys;
+    for (int i = 0; i < idx.size(); i++)
+        single_polys.push_back(poly_set[idx[i]]);
+    return single_polys;
+}
+
+void remove_single_line_polygons(std::vector<std::vector<line>>& poly_set, std::vector<int> idx)
+{
+    for (int i = 0; i < idx.size(); i++)
+        poly_set.erase(poly_set.begin() + idx[i]);
+}
+
+void reorder_single_polys(std::vector<std::vector<line>>& single_polys)
+{
+
+}
+
+/////////////////////////////////////////////////////////////////////////////
+////////////////////////////// Stacked Horizontal lines-related end /////////
+/////////////////////////////////////////////////////////////////////////////
+
+
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -303,25 +348,25 @@ void display(int a[], int n)
 } 
   
 // Function to find the permutations of a given array
-int** findPermutations(int a[], int n_elements, unsigned long long n_perms) 
+int** find_permutations(int a[], int n_elements, unsigned long long n_perms, int final_line_idx) 
 { 
     std::cout << "Number of permutations: " << n_perms << "\nNumber of elements: " << n_elements << std::endl;
-    // Sort the given array 
-    // sort(a, a + n); 
+
     bool stop_condition = true;
     int count = 0;
-    // int perms [n_perms][n_elements];
     int** perms = (int**)malloc(n_perms * sizeof(int*));
     for (unsigned long long i = 0; i < n_perms; i++)
-        perms[i] = (int *)malloc(n_elements * sizeof(int));
+        perms[i] = (int *)malloc((n_elements+1) * sizeof(int));
 
     // Find all possible permutations 
     std::cout << "Possible permutations are:\n"; 
     do{
+        // display(a, n_elements);
         for (int i = 0; i < n_elements; i++) 
         { 
             perms[count][i] = a[i];
         } 
+        perms[count][n_elements] = final_line_idx;
         count++;
         stop_condition = std::next_permutation(a, a + n_elements);
     }while(stop_condition);
@@ -338,7 +383,7 @@ void print_perms(int** perms, int count, int n_elements)
     {
         for (int j = 0; j < n_elements; j++)
         {
-            std::cout << perms[i][j] << " ";
+            std::cout << perms[i][j] << "  ";
         }
         std::cout << std::endl;
     }
@@ -350,9 +395,9 @@ double euc_dist(line l1, line l2)
     
     double x_diff = l1.p2.x - l2.p1.x;
     double y_diff = l1.p2.y - l2.p1.y;
-    auto term1 = pow(x_diff, 2);
-    auto term2 = pow(y_diff, 2);
-    return std::sqrt(term1 + term2);
+    double term1 = pow(x_diff, 2);
+    double term2 = pow(y_diff, 2);
+    return double(std::sqrt(term1 + term2));
 }
 
 size_t get_cost_arr(int** perms, unsigned long long n_perms, int n_elements, std::vector<line> line_set)
@@ -363,14 +408,24 @@ size_t get_cost_arr(int** perms, unsigned long long n_perms, int n_elements, std
         trying to optimize for multiple polygons at the same time.
     */
 
-    float* cost_arr = (float*)malloc(n_perms * sizeof(float));
-    float min_cost = FLT_MAX;
+    double* cost_arr = (double*)malloc(n_perms * sizeof(double));
+
+    double min_cost = DBL_MAX;
     size_t min_idx;
+    int final_line_idx = perms[0][n_elements-1];
+    std::cout << "Final line index printed from get_cost function is: " << final_line_idx << std::endl;
+    std::cout << "n_elements: " << n_elements << std::endl;
     for (unsigned long long i = 0; i < n_perms; i++)
     {
         for (int j = 0; j < n_elements-1; j++)
-        {
+        {   
+            // std::cout << perms[i][j] << " to " << perms[i][j+1] << std::endl;
+            // line_set[perms[i][j]].print_points();
+            // line_set[perms[i][j+1]].print_points();
+            // std::cout << euc_dist(line_set[perms[i][j]], line_set[perms[i][j+1]]) << std::endl;
+
             cost_arr[i] += euc_dist(line_set[perms[i][j]], line_set[perms[i][j+1]]);
+
         }
         // std::cout << "cost: " << cost_arr[i] << std::endl;
         
@@ -412,17 +467,6 @@ void reorder_points(std::vector<line>& line_set)
             line_set[i].p1 = line_set[i].p2;
             line_set[i].p2 = temp_point;
         }
-        // else if (y1 == y2)
-        // {
-        //     // make sure you are not copying by REFERENCE
-        //     temp_line = line_set[i];
-        //     temp_point = temp_line.p1;
-        //     temp_line.p1 = temp_line.p2;
-        //     temp_line.p2 = temp_point;
-
-        //     new_lines.push_back(temp_line);
-        // }
-        // line_set.insert(line_set.end(), new_lines.begin(), new_lines.end());
 
         else if (y1 == y2)
         {
@@ -438,8 +482,13 @@ void reorder_points(std::vector<line>& line_set)
 
     }
 
-    
+}
 
+
+void print_lines(std::vector<line> line_set)
+{
+    for (int i = 0; i < line_set.size(); i++)
+        line_set[i].print_points();
 }
 
 
@@ -451,23 +500,44 @@ std::vector<line> reorder_cuts(std::vector<line> line_set)
     int final_line_starting_vertex_index = final_idx_vec[1];
     std::cout << "Final line index: " << final_line_idx << std::endl;
 
-    line final_line = line_set[final_line_idx];
-    line_set.erase(line_set.begin() + final_line_idx);
-
+    print_lines(line_set);
+    std::cout << std::endl;
+    
     reorder_points(line_set);
 
-    int a[line_set.size()] = {};
+    print_lines(line_set);
+    std::cout << "---------------------" << std::endl;
+
+    line final_line = line_set[final_line_idx];
+    
+
+    int a[line_set.size()-1] = {};
+    int j;
     for (int i = 0; i < line_set.size(); i++)
-        a[i] = i;
+    {
+        j = i;
+        if (i >= final_line_idx)
+            j++;
+        a[i] = j;
+    }       
 
     int n_elements = sizeof(a) / sizeof(a[0]);
 
     unsigned long long n_perms = get_factorial(n_elements);
 
     clock_t begin = std::clock();
-    int** perms = findPermutations(a, n_elements, n_perms); 
+    int** perms = find_permutations(a, n_elements, n_perms, final_line_idx); 
     clock_t end = std::clock();
     std::cout << "Elapsed time for finding permutations: " << double(end-begin)/ CLOCKS_PER_SEC << std::endl;
+
+    n_elements++;
+
+    // print_perms(perms, n_perms, n_elements);
+
+    print_lines(line_set);
+    std::cout << std::endl;
+
+    std::cout << "Here" << std::endl;
 
     begin = std::clock();
     size_t min_idx = get_cost_arr(perms, n_perms, n_elements, line_set);
@@ -477,11 +547,11 @@ std::vector<line> reorder_cuts(std::vector<line> line_set)
     for (int i = 0; i< n_elements; i++)
         reordered_lines.push_back(line_set[perms[min_idx][i]]);
 
-    reordered_lines.push_back(final_line);
 
     for (int i = 0; i < n_elements; i++)
         std::cout << perms[min_idx][i] << " ";
-    std::cout << final_line_idx << std::endl;
+    // std::cout << final_line_idx << std::endl;
+    std::cout << std::endl;
 
     return reordered_lines;
 
@@ -667,7 +737,7 @@ int main(int argc, char** argv)
     std::cout << "Don't forget to change the hard-coded array" << std::endl;
   
     clock_t begin = std::clock();
-    int** perms = findPermutations(a, n_elements, n_perms); 
+    int** perms = find_permutations(a, n_elements, n_perms); 
     clock_t end = std::clock();
     std::cout << "Elapsed time for finding permutations: " << double(end-begin)/ CLOCKS_PER_SEC << std::endl;
 

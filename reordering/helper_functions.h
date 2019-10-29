@@ -22,6 +22,7 @@ struct point
     { 
         return (x == other.x && y == other.y);
     }
+    
 
 };
 
@@ -31,12 +32,12 @@ struct line
     point p1;
     point p2;
 
+    void print_points()
+    {
+        std::cout << "(" << p1.x << ", " << p1.y << ")" << " and " << "(" << p2.x << ", " << p2.y << ")" << std::endl;
+    }
+
 };
-
-
-/////////////////////////////////////////////////////////////////////////////
-////////////////////////////// Polygon-related start ////////////////////////
-/////////////////////////////////////////////////////////////////////////////
 
 
 // specialized hash function for unordered_map keys, for the point struct
@@ -68,9 +69,11 @@ int get_factorial(unsigned int n);
 
 void display(int a[], int n);
 
-int** findPermutations(int a[], int n_elements, unsigned long long n_perms);
+int** find_permutations(int a[], int n_elements, unsigned long long n_perms);
 
 void print_perms(int** perms, int count, int n_elements);
+
+void print_lines(std::vector<line> line_set);
 
 double euc_dist(line l1, line l2);
 

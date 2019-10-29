@@ -1,8 +1,12 @@
-#include "ordering_function.h"
+#include "helper_functions.h"
 
 
 int main(int argc, char** agrv)
 {
+
+    // This is here because "true" and "false" are printed out as 1 and 0, whereas this fixes it.
+    std::cout.setf(std::ios::boolalpha);
+
 
     std::vector<line> square;
     std::vector<line> triangle;
@@ -10,6 +14,7 @@ int main(int argc, char** agrv)
     std::vector<line> upper_left_corner_mirrored_L_shape;
     std::vector<line> lower_left_corner_inverted_L_shape;
     std::vector<line> lower_left_corner_inverted_wide_angle_L_shape;
+    std::vector<line> stacked_horizontals;
 
     point p1 = {2, 2};
     point p2 = {2, 4};
@@ -114,12 +119,22 @@ int main(int argc, char** agrv)
     lower_left_corner_inverted_wide_angle_L_shape.push_back(l1);
     lower_left_corner_inverted_wide_angle_L_shape.push_back(l2);
 
+    point p55 = {2, 6};
+    point p88 = {4, 6};
+    line l99 = {p55, p88};
+
+
+    stacked_horizontals.push_back(l4);
+    stacked_horizontals.push_back(l2);
+    stacked_horizontals.push_back(l99);
+
 
     std::cout << "Running.." << std::endl;
 
 
     std::vector<line> reorderd_sequence = reorder_cuts(square);
 
+    
 
     return 0;
 }

@@ -1,8 +1,8 @@
 run this command to compile and run:
 ```
-g++ -std=c++11 ordering_function.cpp main.cpp -o main && ./main
+g++ -std=c++11 helper_functions.cpp ordering_test.cpp -o ordering_test && ./ordering_test
 ```
 or if you want to only run: 
 ```
-./main
+./ordering_test
 ```
