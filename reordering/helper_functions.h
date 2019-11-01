@@ -37,6 +37,13 @@ struct line
         std::cout << "(" << p1.x << ", " << p1.y << ")" << " and " << "(" << p2.x << ", " << p2.y << ")" << std::endl;
     }
 
+    point get_higher_point_y_wise()
+    {
+        if (p1.y > p2.y)
+            return p1;
+        else return p2;
+    }
+
 };
 
 
@@ -55,6 +62,9 @@ struct hash_fn
 	}
 };
 
+
+
+typedef std::array<int, 2> custom_arr_type;
 
 
 void print_map(std::unordered_map<point,int, hash_fn> const &m);
@@ -82,3 +92,5 @@ size_t get_cost_arr(int** perms, unsigned long long n_perms, int n_elements, std
 void reorder_points(std::vector<line>& line_set);
 
 std::vector<line> reorder_cuts(std::vector<line> line_set);
+
+std::map<custom_arr_type, int> board_wide_poly(std::vector<std::vector<line>> poly_set, const int board_width);

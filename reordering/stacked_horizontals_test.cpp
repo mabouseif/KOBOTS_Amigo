@@ -32,6 +32,11 @@ int main(int argc, char** argv)
     stacked_horizontals.push_back(polygon_2);
     stacked_horizontals.push_back(polygon_3);
 
+    int board_width = 2;
+    std::map<custom_arr_type, int> my_map = board_wide_poly(stacked_horizontals, board_width);
+    std::cout << my_map.size() << std::endl;
+
+    // https://stackoverflow.com/questions/44190962/using-array-as-map-key-impossible-even-with-custom-allocator
 
     return 0;
 }

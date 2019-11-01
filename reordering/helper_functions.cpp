@@ -279,40 +279,35 @@ std::vector<int> get_index_of_final_line_and_starting_vertex(std::vector<line> l
 ////////////////////////////// Stacked Horizontal lines-related start /////////
 /////////////////////////////////////////////////////////////////////////////
 
-bool is_single_line_polygon_and_board_wide(std::vector<line> line_set, const int board_width)
-{
-    if (line_set.size() == 1 && std::abs(line_set[0].p1.x - line_set[0].p2.x) == board_width)
-        return true;
-    return false;
-}
 
-std::vector<int> get_single_line_polygon_indices(std::vector<std::vector<line>> poly_set, const int board_width)
+std::map<custom_arr_type, int> board_wide_poly(std::vector<std::vector<line>> poly_set, const int board_width)
 {
-    std::vector<int> idx;
+    
+    std::map<custom_arr_type, int> board_wide_polygon_map;
+    std::pair<custom_arr_type, int> p;
+    int poly_idx, line_idx, y_value;
+    std::vector<line> polygon;
+    custom_arr_type my_arr;
     for (int i = 0; i < poly_set.size(); i++)
-        if (is_single_line_polygon_and_board_wide(poly_set[i], board_width))
-            idx.push_back(i);
-    return idx;
+    {
+        polygon = poly_set[i];
+        for (int j = 0; j < polygon.size(); j++)
+            {
+                if (std::abs(polygon[j].p1.x - polygon[j].p2.x) == board_width)
+                {
+                    poly_idx = i; line_idx = j; y_value = polygon[j].get_higher_point_y_wise().y;
+                    my_arr = {poly_idx, line_idx};
+                    board_wide_polygon_map.insert(std::make_pair(my_arr, y_value));
+                    // std::cout << arr << std::endl;
+                    // board_wide_polygon_map[] = y_value;
+                }  
+            }
+    }
+           
+    return board_wide_polygon_map;  
 }
 
-std::vector<std::vector<line>> get_single_line_polygons(std::vector<std::vector<line>> poly_set, std::vector<int> idx)
-{
-    std::vector<std::vector<line>> single_polys;
-    for (int i = 0; i < idx.size(); i++)
-        single_polys.push_back(poly_set[idx[i]]);
-    return single_polys;
-}
 
-void remove_single_line_polygons(std::vector<std::vector<line>>& poly_set, std::vector<int> idx)
-{
-    for (int i = 0; i < idx.size(); i++)
-        poly_set.erase(poly_set.begin() + idx[i]);
-}
-
-void reorder_single_polys(std::vector<std::vector<line>>& single_polys)
-{
-
-}
 
 /////////////////////////////////////////////////////////////////////////////
 ////////////////////////////// Stacked Horizontal lines-related end /////////
