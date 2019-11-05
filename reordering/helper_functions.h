@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <cmath>
 #include <math.h>
-
+#include "../matplotlibcpp.h"
 
 /* The point struct has an extra operator == function because it is required 
  when creating unordered maps with custom classes/structs
@@ -107,3 +107,5 @@ void reorder_points(std::vector<line>& line_set);
 std::vector<line> reorder_cuts(std::vector<line> line_set);
 
 std::map<int, custom_arr_type> board_wide_poly(std::vector<std::vector<line>>& poly_set, const int board_width);
+
+void plot_poly_set(std::vector<std::vector<line>> poly_set);

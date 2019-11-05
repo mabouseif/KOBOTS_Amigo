@@ -1,5 +1,7 @@
 #include "helper_functions.h"
 
+namespace plt = matplotlibcpp;
+
 /*
     Things to remember:
     1- Many horizontal lines case.
@@ -400,6 +402,27 @@ std::map<int, custom_arr_type> board_wide_poly(std::vector<std::vector<line>>& p
 
 
 
+void plot_poly_set(std::vector<std::vector<line>> poly_set)
+{
+    line line_for_plot;
+    double x1, y1, x2, y2;
+    plt::figure_size(1200, 780);
+    for (int i = 0; i < poly_set.size(); i++)
+    {
+        for (int j = 0; j < poly_set[i].size(); j++)
+        {
+            line_for_plot = poly_set[i][j];
+            x1 = line_for_plot.p1.x; y1 = line_for_plot.p1.y; x2 = line_for_plot.p2.x; y2= line_for_plot.p2.y;
+            plt::plot({x1, x2}, {y1, y2}, "b--");
+            plt::text((x1+x2)/2, (y1+y2)/2, std::to_string(i)+ std::to_string(j));
+        }
+    }
+    plt::xlim(0, 7);
+    plt::ylim(0, 7);
+    plt::show();
+}
+
+
 /////////////////////////////////////////////////////////////////////////////
 ////////////////////////////// Stacked Horizontal lines-related end /////////
 /////////////////////////////////////////////////////////////////////////////
@@ -647,10 +670,6 @@ std::vector<line> reorder_cuts(std::vector<line> line_set)
 /////////////////////////////////////////////////////////////////////////////
 ////////////////////////////// Ordering Lines-related end ///////////////////
 /////////////////////////////////////////////////////////////////////////////
-
-
-
-
 
 
 
