@@ -279,6 +279,34 @@ std::vector<int> get_index_of_final_line_and_starting_vertex(std::vector<line> l
 ////////////////////////////// Stacked Horizontal lines-related start /////////
 /////////////////////////////////////////////////////////////////////////////
 
+std::vector<std::vector<line>> reorder_board_wide_polys(std::map<int, custom_arr_type> board_wide_polygon_map, std::vector<std::vector<line>> poly_set_copy)
+{
+    std::vector<std::vector<line>> reordered_board_wide_polys;
+    int y_val;
+    int poly_idx;
+    int line_idx;
+    std::vector<line> polygon;
+    line board_wide_line;
+    for (std::map<int, custom_arr_type>::reverse_iterator rev_it = board_wide_polygon_map.rbegin(); rev_it != board_wide_polygon_map.rend(); ++rev_it)
+    {
+        poly_idx = (*rev_it).second[0]; line_idx = (*rev_it).second[1];
+        polygon = poly_set_copy[poly_idx];
+        if (polygon.size() > 1)
+        {
+            board_wide_line = polygon[line_idx];
+            polygon.erase(polygon.begin()+line_idx);
+            // You would need to add this line, as the final line in reordering,
+            // so that it would be accounted for during permutations, in order
+            // to get the best cost.
+            polygon = reorder_cuts(polygon); 
+            polygon.push_back(board_wide_line);
+        }
+
+        reordered_board_wide_polys.push_back(polygon);   
+    }
+
+    return reordered_board_wide_polys;
+}
 
 std::map<int, custom_arr_type> board_wide_poly(std::vector<std::vector<line>>& poly_set, const int board_width)
 {
@@ -288,7 +316,7 @@ std::map<int, custom_arr_type> board_wide_poly(std::vector<std::vector<line>>& p
     int poly_idx, line_idx, y_value;
     std::vector<line> polygon;
     std::vector<int> polygons_board_wide_idx;
-    std::vector<line> polygons_board_wide_line;
+    std::vector<int> polygons_board_wide_y_val_keys;
     custom_arr_type my_arr;
     for (int i = 0; i < poly_set.size(); i++)
     {
@@ -299,6 +327,7 @@ std::map<int, custom_arr_type> board_wide_poly(std::vector<std::vector<line>>& p
                 {
                     poly_idx = i; line_idx = j; y_value = polygon[j].get_higher_point_y_wise().y;
                     polygons_board_wide_idx.push_back(poly_idx);
+                    polygons_board_wide_y_val_keys.push_back(y_value);
                     my_arr = {poly_idx, line_idx};
                     board_wide_polygon_map.insert(std::make_pair(y_value, my_arr));
                 }  
@@ -343,11 +372,28 @@ std::map<int, custom_arr_type> board_wide_poly(std::vector<std::vector<line>>& p
         poly_set[i] = reorder_cuts(poly_set[i]);
 
     // Reorder board-wide polygons
-    /* TODO: 1 - Normal case, where all lines are horizontal
-             2 - Multiple board-wide lines in the polygon
+    /* TODO: 1 - Normal case, where all lines are horizontal, only line per poly (done)
+             2 - Polygon has multiple lines, and there's one which is board-wide
+             3 - Multiple board-wide lines in the polygon
     */
-    
 
+   std::vector<std::vector<line>> reordered_board_wide_polys = reorder_board_wide_polys( board_wide_polygon_map, poly_set_copy);
+   for (int i =0; i < reordered_board_wide_polys.size(); i++)
+        poly_set.push_back(reordered_board_wide_polys[i]);
+
+//    for (std::map<int, custom_arr_type>::reverse_iterator rev_it = board_wide_polygon_map.rbegin(); rev_it != board_wide_polygon_map.rend(); ++rev_it)
+//         {
+//             std::cout << "Index of poly during reappending (reverse iterator part): " << (*rev_it).second[0] << std::endl;
+//             poly_set.push_back(poly_set_copy[(*rev_it).second[0]]);
+//         }
+    
+    for (int i = 0; i < poly_set.size(); i++)
+    {
+        std::cout << "----------" << std::endl;
+        for (int j = 0; j < poly_set[i].size(); j++)
+            poly_set[i][j].print_points();
+    }
+        
            
     return board_wide_polygon_map;  
 }
