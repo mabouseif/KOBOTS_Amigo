@@ -280,13 +280,15 @@ std::vector<int> get_index_of_final_line_and_starting_vertex(std::vector<line> l
 /////////////////////////////////////////////////////////////////////////////
 
 
-std::map<custom_arr_type, int> board_wide_poly(std::vector<std::vector<line>> poly_set, const int board_width)
+std::map<int, custom_arr_type> board_wide_poly(std::vector<std::vector<line>>& poly_set, const int board_width)
 {
     
-    std::map<custom_arr_type, int> board_wide_polygon_map;
-    std::pair<custom_arr_type, int> p;
+    std::map<int, custom_arr_type> board_wide_polygon_map;
+    std::pair<int, custom_arr_type> p;
     int poly_idx, line_idx, y_value;
     std::vector<line> polygon;
+    std::vector<int> polygons_board_wide_idx;
+    std::vector<line> polygons_board_wide_line;
     custom_arr_type my_arr;
     for (int i = 0; i < poly_set.size(); i++)
     {
@@ -296,13 +298,56 @@ std::map<custom_arr_type, int> board_wide_poly(std::vector<std::vector<line>> po
                 if (std::abs(polygon[j].p1.x - polygon[j].p2.x) == board_width)
                 {
                     poly_idx = i; line_idx = j; y_value = polygon[j].get_higher_point_y_wise().y;
+                    polygons_board_wide_idx.push_back(poly_idx);
                     my_arr = {poly_idx, line_idx};
-                    board_wide_polygon_map.insert(std::make_pair(my_arr, y_value));
-                    // std::cout << arr << std::endl;
-                    // board_wide_polygon_map[] = y_value;
+                    board_wide_polygon_map.insert(std::make_pair(y_value, my_arr));
                 }  
             }
     }
+    // board-wide polys indicies in poly_set sorted in ascending order
+    std::sort(polygons_board_wide_idx.begin(), polygons_board_wide_idx.end());
+    for (std::vector<int>::iterator it=polygons_board_wide_idx.begin(); it != polygons_board_wide_idx.end(); it++)
+        std::cout << *it << std::endl;
+
+    // By here you have (sorted in ascending order)
+    // the y-val, {poly_idx, line_idx} map of the board-wide polys
+
+    // Now remove those board-wide polys from poly_set, which is passed by REFERENCE!
+    int n = polygons_board_wide_idx.size();
+    int compare_idx;
+    std::vector<std::vector<line>> poly_set_copy = poly_set;
+    std::cout << "poly_set_copy size is " << poly_set_copy.size() << std::endl;
+    if (board_wide_polygon_map.size() > 0)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            compare_idx = n-1-i;
+            std::cout << "compare_idx: " << compare_idx << std::endl;
+            std::cout << "polygons_board_wide_idx[compare_idx]: " << polygons_board_wide_idx[compare_idx] << std::endl;
+            for (std::vector<std::vector<line>>::iterator it = poly_set.begin(); it != poly_set.end(); it++)
+            {
+                if ((*it) == poly_set_copy[polygons_board_wide_idx[compare_idx]])
+                {   
+                    // it->clear();
+                    poly_set.erase(it);
+                    break; // The break was necessary, because when you erase an element, the vector decreases in size,
+                           // but you have the stop condition at vector.end(), which is already set before loop entry.
+                }
+                    
+            }
+        }
+    }
+    // Now that the poly set is normal, reorder cuts of the polyset
+    std::cout << "poly_set.size() = " << poly_set.size() << std::endl;
+    for (int i = 0; i < poly_set.size(); i++)
+        poly_set[i] = reorder_cuts(poly_set[i]);
+
+    // Reorder board-wide polygons
+    /* TODO: 1 - Normal case, where all lines are horizontal
+             2 - Multiple board-wide lines in the polygon
+    */
+    
+
            
     return board_wide_polygon_map;  
 }
@@ -542,7 +587,7 @@ std::vector<line> reorder_cuts(std::vector<line> line_set)
     for (int i = 0; i< n_elements; i++)
         reordered_lines.push_back(line_set[perms[min_idx][i]]);
 
-
+    std::cout << "Best permutation: ";
     for (int i = 0; i < n_elements; i++)
         std::cout << perms[min_idx][i] << " ";
     // std::cout << final_line_idx << std::endl;

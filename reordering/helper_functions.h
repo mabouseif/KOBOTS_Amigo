@@ -44,6 +44,19 @@ struct line
         else return p2;
     }
 
+    bool operator==(const line &other) const
+    {
+        if (p1== other.p1 && p2==other.p2)
+            return true;
+        if (p1== other.p2 && p2==other.p1)
+        {
+            std::cout << "lines equal but reversed" << std::endl;
+            return true;
+        }
+        
+        return false;
+    }
+
 };
 
 
@@ -93,4 +106,4 @@ void reorder_points(std::vector<line>& line_set);
 
 std::vector<line> reorder_cuts(std::vector<line> line_set);
 
-std::map<custom_arr_type, int> board_wide_poly(std::vector<std::vector<line>> poly_set, const int board_width);
+std::map<int, custom_arr_type> board_wide_poly(std::vector<std::vector<line>>& poly_set, const int board_width);
