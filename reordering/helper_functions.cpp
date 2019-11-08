@@ -406,7 +406,7 @@ void plot_poly_set(std::vector<std::vector<line>> poly_set)
 {
     line line_for_plot;
     double x1, y1, x2, y2;
-    plt::figure_size(1200, 780);
+    plt::figure_size(800, 600);
     for (int i = 0; i < poly_set.size(); i++)
     {
         for (int j = 0; j < poly_set[i].size(); j++)
@@ -526,6 +526,7 @@ size_t get_cost_arr(int** perms, unsigned long long n_perms, int n_elements, std
     std::cout << "n_elements: " << n_elements << std::endl;
     for (unsigned long long i = 0; i < n_perms; i++)
     {
+        cost_arr[i] = 0;
         for (int j = 0; j < n_elements-1; j++)
         {   
             // std::cout << perms[i][j] << " to " << perms[i][j+1] << std::endl;
@@ -546,6 +547,9 @@ size_t get_cost_arr(int** perms, unsigned long long n_perms, int n_elements, std
     }
 
     std::cout << "Minimum Cost is " << min_cost << std::endl;
+
+    free(cost_arr);
+    std::cout << "Cost array freed (supposedly)" << std::endl;
 
     return min_idx;
 
@@ -609,7 +613,7 @@ std::vector<line> reorder_cuts(std::vector<line> line_set)
     int final_line_starting_vertex_index = final_idx_vec[1];
     std::cout << "Final line index: " << final_line_idx << std::endl;
 
-    print_lines(line_set);
+    // print_lines(line_set);
     std::cout << std::endl;
     
     reorder_points(line_set);
@@ -641,12 +645,12 @@ std::vector<line> reorder_cuts(std::vector<line> line_set)
 
     n_elements++;
 
-    // print_perms(perms, n_perms, n_elements);
+    print_perms(perms, n_perms, n_elements);
 
     print_lines(line_set);
     std::cout << std::endl;
 
-    std::cout << "Here" << std::endl;
+
 
     begin = std::clock();
     size_t min_idx = get_cost_arr(perms, n_perms, n_elements, line_set);
@@ -659,8 +663,12 @@ std::vector<line> reorder_cuts(std::vector<line> line_set)
     std::cout << "Best permutation: ";
     for (int i = 0; i < n_elements; i++)
         std::cout << perms[min_idx][i] << " ";
-    // std::cout << final_line_idx << std::endl;
+    std::cout << final_line_idx << std::endl;
     std::cout << std::endl;
+
+    for (size_t i = 0; i < n_perms; i++)
+        free(perms[i]);
+    free(perms);
 
     return reordered_lines;
 
