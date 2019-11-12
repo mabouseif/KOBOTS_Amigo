@@ -44,6 +44,13 @@ struct line
         else return p2;
     }
 
+    void switch_points()
+    {
+        point temp = p1;
+        this->p1 = p2;
+        this->p2 = temp;
+    }
+
     bool operator==(const line &other) const
     {
         if (p1== other.p1 && p2==other.p2)
@@ -56,6 +63,12 @@ struct line
         
         return false;
     }
+
+    bool is_flat()
+    {
+        return p1.y == p2.y;
+    }
+        
 
 };
 
@@ -109,3 +122,9 @@ std::vector<line> reorder_cuts(std::vector<line> line_set);
 std::map<int, custom_arr_type> board_wide_poly(std::vector<std::vector<line>>& poly_set, const int board_width);
 
 void plot_poly_set(std::vector<std::vector<line>> poly_set);
+
+size_t get_cost_arr_new(int** perms, unsigned long long n_perms, int n_elements, std::vector<line>& line_set);
+
+std::vector<std::vector<int> > create_truth_table(const unsigned n);
+
+void switch_line_points(std::vector<line>& line_set, std::vector<int> line_indicies, std::vector<int> truth_table_input);

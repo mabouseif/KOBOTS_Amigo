@@ -417,8 +417,8 @@ void plot_poly_set(std::vector<std::vector<line>> poly_set)
             plt::text((x1+x2)/2, (y1+y2)/2, std::to_string(i)+ std::to_string(j));
         }
     }
-    plt::xlim(0, 7);
-    plt::ylim(0, 7);
+    plt::xlim(-1, 10);
+    plt::ylim(-1, 10);
     plt::show();
 }
 
@@ -645,7 +645,7 @@ std::vector<line> reorder_cuts(std::vector<line> line_set)
 
     n_elements++;
 
-    print_perms(perms, n_perms, n_elements);
+    // print_perms(perms, n_perms, n_elements);
 
     print_lines(line_set);
     std::cout << std::endl;
@@ -653,7 +653,8 @@ std::vector<line> reorder_cuts(std::vector<line> line_set)
 
 
     begin = std::clock();
-    size_t min_idx = get_cost_arr(perms, n_perms, n_elements, line_set);
+    // get_cost_arr
+    size_t min_idx = get_cost_arr_new(perms, n_perms, n_elements, line_set);
     end = std::clock();
     std::cout << "Elapsed time for calculating cost of all permutations and finding the minimum value index: " << double(end-begin)/ CLOCKS_PER_SEC << std::endl;
 
@@ -663,7 +664,7 @@ std::vector<line> reorder_cuts(std::vector<line> line_set)
     std::cout << "Best permutation: ";
     for (int i = 0; i < n_elements; i++)
         std::cout << perms[min_idx][i] << " ";
-    std::cout << final_line_idx << std::endl;
+    // std::cout << final_line_idx << std::endl;
     std::cout << std::endl;
 
     for (size_t i = 0; i < n_perms; i++)
@@ -674,6 +675,111 @@ std::vector<line> reorder_cuts(std::vector<line> line_set)
 
 }
 
+
+size_t get_cost_arr_new(int** perms, unsigned long long n_perms, int n_elements, std::vector<line>& line_set)
+{
+    /*
+        Should also append all indices of permutations that are resulting 
+        in minimum cost and pick the one that would be more optimal when
+        trying to optimize for multiple polygons at the same time.
+    */
+
+    double* cost_arr = (double*)malloc(n_perms * sizeof(double));
+    memset(cost_arr, 999999, sizeof(cost_arr));
+
+    int* truth_table_min_cost_idicies = (int*)malloc(n_perms * sizeof(int));
+
+    double min_cost = DBL_MAX;
+    size_t min_idx;
+    int final_line_idx = perms[0][n_elements-1];
+    std::cout << "Final line index printed from get_cost function is: " << final_line_idx << std::endl;
+    std::cout << "n_elements: " << n_elements << std::endl;
+
+    // Get flat line indices
+    std::vector<int> flat_line_indices;
+    for (int i = 0; i < line_set.size(); i++)
+        if (line_set[i].is_flat())
+            flat_line_indices.push_back(i);
+    
+    // Create truth_table
+    std::vector<std::vector<int>> truth_table = create_truth_table(flat_line_indices.size());
+
+    std::vector<line> line_set_copy;
+    double cost;
+    int min_cost_perm_idx;
+    for (unsigned long long i = 0; i < n_perms; i++)
+    {
+        for (int j = 0; j < truth_table.size(); j++)
+        {
+            line_set_copy = line_set;
+            switch_line_points(line_set_copy, flat_line_indices, truth_table[j]);
+
+            cost = 0;
+            for (int k = 0; k < n_elements-1; k++)
+            {
+                cost += euc_dist(line_set_copy[perms[i][k]], line_set_copy[perms[i][k+1]]);
+                if (cost > min_cost)
+                    break;
+            }
+            // need to consider/treat the equal case. Either here or on
+            // the previous cost check
+            if (cost < min_cost)
+            {
+                min_cost = cost;
+                truth_table_min_cost_idicies[i] = j;
+                min_cost_perm_idx = i; // should we have a container for this as well?
+                
+            }
+
+        }
+    }
+
+    switch_line_points(line_set, flat_line_indices, truth_table[truth_table_min_cost_idicies[min_cost_perm_idx]]);
+
+    free(truth_table_min_cost_idicies);
+    free(cost_arr);
+
+    return min_cost_perm_idx;
+}
+
+
+std::vector<std::vector<int> > create_truth_table(const unsigned n)
+{
+    // Copied from StackOverflow
+    std::vector<std::vector<int> > output(n, std::vector<int>(1 << n));
+
+    unsigned num_to_fill = 1U << (n - 1);
+    for(unsigned col = 0; col < n; ++col, num_to_fill >>= 1U)
+    {
+        for(unsigned row = num_to_fill; row < (1U << n); row += (num_to_fill * 2))
+        {
+            std::fill_n(&output[col][row], num_to_fill, 1);
+        }
+    }
+
+    return output;
+
+    // // These loops just print out the results, nothing more.
+    // for(unsigned x = 0; x < (1 << n); ++x)
+    // {
+    //     for(unsigned y = 0; y < n; ++y)
+    //     {
+    //         std::cout << output[y][x] << " ";
+    //     }
+    //     std::cout << std::endl;
+    // }
+}
+
+void switch_line_points(std::vector<line>& line_set, std::vector<int> line_indicies, std::vector<int> truth_table_input)
+{
+    for(int i = 0; i < line_indicies.size(); i++)
+    {
+        if (truth_table_input[i] == 1)
+        {
+            line_set[line_indicies[i]].switch_points();
+        }
+    }
+}
 
 /////////////////////////////////////////////////////////////////////////////
 ////////////////////////////// Ordering Lines-related end ///////////////////

@@ -51,6 +51,49 @@ int main(int argc, char** argv)
     stacked_horizontals_w_square.push_back(polygon_2);
     stacked_horizontals_w_square.push_back(polygon_small_square);
     stacked_horizontals_w_square.push_back(polygon_3);
+
+
+    point p11 = {0, 0};
+    point p12 = {1, 5};
+    point p13 = {2, 3};
+    point p14 = {3, 5};
+    point p15 = {4, 3};
+    point p16 = {5, 5};
+    point p17 = {6, 3};
+    point p18 = {7, 5};
+    point p19 = {8, 3};
+    point p20 = {9, 5};
+    point p21 = {10, 0};
+    point p22 = {11, 5};
+    point p23 = {12, 0};
+
+    l1 = {p11, p12};
+    l2 = {p12, p13};
+    l3 = {p13, p14};
+    l4 = {p14, p15};
+    l5 = {p15, p16};
+    l6 = {p16, p17};
+    l7 = {p17, p18};
+    line l8 = {p18, p19};
+    line l9 = {p19, p20};
+    line l10 = {p20, p21};
+    line l11 = {p21, p11};
+    line l12 = {p22, p23};
+
+    std::vector<line> kings_crown;
+    kings_crown.push_back(l1);
+    kings_crown.push_back(l2);
+    kings_crown.push_back(l3);
+    kings_crown.push_back(l4);
+    kings_crown.push_back(l5);
+    kings_crown.push_back(l6);
+    kings_crown.push_back(l7);
+    kings_crown.push_back(l8);
+    kings_crown.push_back(l9);
+    kings_crown.push_back(l10);
+    kings_crown.push_back(l11);
+
+    // stacked_horizontals_w_square.push_back(kings_crown);
     
 
     std::cout << "poly set size before: " << stacked_horizontals_w_square.size() << std::endl;
@@ -66,7 +109,11 @@ int main(int argc, char** argv)
 
     // https://stackoverflow.com/questions/44190962/using-array-as-map-key-impossible-even-with-custom-allocator
 
-    plot_poly_set(stacked_horizontals_w_square);
+    // plot_poly_set(stacked_horizontals_w_square);
+
+
+
+
 
 
     return 0;
