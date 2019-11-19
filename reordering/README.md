@@ -20,3 +20,10 @@ For running valgrind memory-leak and other checks (comment out plotting matplotl
 ```
 g++ -g helper_functions.cpp stacked_horizontals_test.cpp -o stacked_horizontals_test -std=c++11 -I/usr/include/python2.7 -lpython2.7 && valgrind --leak-check=yes --track-origins=yes --dsymutil=yes ./stacked_horizontals_test
 ```
+
+
+## TODO
+- Board-wide polys
+- Direction of final line
+
+## Notes

@@ -33,6 +33,7 @@ int main(int argc, char** argv)
     std::vector<line> polygon_2;
     std::vector<line> polygon_3;
     std::vector<line> polygon_small_square;
+    
 
     polygon_1.push_back(l1);
     polygon_2.push_back(l2);
@@ -41,6 +42,7 @@ int main(int argc, char** argv)
     polygon_small_square.push_back(l5);
     polygon_small_square.push_back(l6);
     polygon_small_square.push_back(l7);
+
     
 
     stacked_horizontals.push_back(polygon_1);
@@ -93,23 +95,36 @@ int main(int argc, char** argv)
     kings_crown.push_back(l10);
     kings_crown.push_back(l11);
 
+    std::vector<line> triangle;
+    p1 = {2, 7};
+    p2 = {2, 9};
+    p3 = {4, 7};
+
+    l1 = {p1, p2};
+    l2 = {p2, p3};
+    l3 = {p3, p1};
+    triangle.push_back(l1);
+    triangle.push_back(l2);
+    triangle.push_back(l3);
+
     // stacked_horizontals_w_square.push_back(kings_crown);
+    stacked_horizontals_w_square.push_back(triangle);
     
 
     std::cout << "poly set size before: " << stacked_horizontals_w_square.size() << std::endl;
-    
 
     int board_width = 2;
     std::map<int, custom_arr_type> my_map = board_wide_poly(stacked_horizontals_w_square, board_width);
     std::cout << "Number of polygons with a line that is board-wide: " << my_map.size() << std::endl;
     std::cout << "poly set size after: " << stacked_horizontals_w_square.size() << std::endl;
 
+
     for(auto const &pair: my_map)
         std::cout << pair.first << std::endl;
 
     // https://stackoverflow.com/questions/44190962/using-array-as-map-key-impossible-even-with-custom-allocator
 
-    // plot_poly_set(stacked_horizontals_w_square);
+    plot_poly_set(stacked_horizontals_w_square);
 
 
 
