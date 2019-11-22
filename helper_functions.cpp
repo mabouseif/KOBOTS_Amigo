@@ -403,7 +403,7 @@ std::map<int, custom_arr_type> board_wide_poly(std::vector<std::vector<line>>& p
 
 
 
-void plot_poly_set(std::vector<std::vector<line>> poly_set)
+void plot_poly_set(std::vector<std::vector<line>> poly_set, int xlims[2], int ylims[2])
 {
     line line_for_plot;
     double x1, y1, x2, y2;
@@ -418,8 +418,8 @@ void plot_poly_set(std::vector<std::vector<line>> poly_set)
             plt::text((x1+x2)/2, (y1+y2)/2, std::to_string(i)+ std::to_string(j));
         }
     }
-    plt::xlim(-1, 10);
-    plt::ylim(-1, 10);
+    plt::xlim(xlims[0], xlims[1]);
+    plt::ylim(ylims[0], ylims[1]);
     plt::show();
 }
 

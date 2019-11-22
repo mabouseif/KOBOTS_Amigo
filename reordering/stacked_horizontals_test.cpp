@@ -1,4 +1,4 @@
-#include "helper_functions.h"
+#include "../helper_functions.h"
 
 int main(int argc, char** argv)
 {
@@ -124,7 +124,9 @@ int main(int argc, char** argv)
 
     // https://stackoverflow.com/questions/44190962/using-array-as-map-key-impossible-even-with-custom-allocator
 
-    plot_poly_set(stacked_horizontals_w_square);
+    int xlims[2] = {-1, 10};
+    int ylims[2] = {-1, 10};
+    plot_poly_set(stacked_horizontals_w_square, ylims, ylims);
 
 
 
