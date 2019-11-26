@@ -407,17 +407,33 @@ void plot_poly_set(std::vector<std::vector<line>> poly_set, int xlims[2], int yl
 {
     line line_for_plot;
     double x1, y1, x2, y2;
-    plt::figure_size(800, 600);
+    std::vector<std::string> line_texture_vec = {"r-", "m-", "g-", "y-", "k-", "b-"};
+    std::string line_texture;
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(line_texture_vec.begin(), line_texture_vec.end(), g);
+    plt::figure_size(500, 500);
+
+    if (line_texture_vec.size() < poly_set.size())
+    {
+        std::cout << "In plot_poly_set, not enough styles for all polys!" << std::endl;
+        exit;
+    }
+
     for (int i = 0; i < poly_set.size(); i++)
     {
+        line_texture = line_texture_vec[i];
+
         for (int j = 0; j < poly_set[i].size(); j++)
         {
             line_for_plot = poly_set[i][j];
             x1 = line_for_plot.p1.x; y1 = line_for_plot.p1.y; x2 = line_for_plot.p2.x; y2= line_for_plot.p2.y;
-            plt::plot({x1, x2}, {y1, y2}, "b--");
+            plt::plot({x1, x2}, {y1, y2}, line_texture);
             plt::text((x1+x2)/2, (y1+y2)/2, std::to_string(i)+ std::to_string(j));
         }
     }
+
+    
     plt::xlim(xlims[0], xlims[1]);
     plt::ylim(ylims[0], ylims[1]);
     plt::show();
@@ -861,7 +877,6 @@ int main(int argc, char** argv)
     l9 = {p19, p20};
     l10 = {p20, p21};
     l11 = {p21, p11};
-    l12 = {p22, p23};
 
     kings_crown.push_back(l1);
     kings_crown.push_back(l2);
