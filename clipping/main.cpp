@@ -8,8 +8,8 @@ using namespace ClipperLib;
 #define SHRINK 0
 #define EXPAND 1
 
-// void offset_polygon(std::vector<line>& polygon, int mode)
-std::vector<line> offset_polygon(std::vector<line> polygon, int mode)
+
+std::vector<line> offset_poly(std::vector<line> polygon, int mode)
 {
     int offset_val;
 
@@ -78,7 +78,6 @@ std::vector<line> offset_polygon(std::vector<line> polygon, int mode)
     // Need to check the open-polygon case.
     line temp_line;
     int n = solution[0].size();
-    std::cout << "Size of solution: " << n << std::endl;
 
     if (n==0)
     {
@@ -87,11 +86,8 @@ std::vector<line> offset_polygon(std::vector<line> polygon, int mode)
     }
     
     // Need to handle the open-polygon case here
-    // bool poly_or_not = is_polygon(polygon);
     bool poly_or_not = is_polygon(polygon);
     int z = n;
-    
-    // polygon.clear();
 
     std::vector<line> new_polygon;
     for(int i = 0; i < z; i++)
@@ -115,33 +111,124 @@ std::vector<line> offset_polygon(std::vector<line> polygon, int mode)
       std::cout << std::endl;
     }
 
+    return new_polygon;
+
+
+    // //let's see the result too ...
+    // original << subj;
+
+    // SVGBuilder svg;
+    // svg.style.penWidth = 1.5;
+    // svg.style.brushClr = 0x1200009C;
+    // svg.style.penClr = 0xFF000000;
+    // svg.style.pft = pftNonZero;
+    // svg.AddPaths(original);
+    // // svg.style.brushClr = 0x129C0000;
+    // // svg.style.penClr = 0xCCFFA07A;
+    // // svg.style.pft = pftNonZero;
+    // // svg.AddPaths(clip);
+    // svg.style.brushClr = 0x3000FF00;
+    // svg.style.penClr = 0xFF006600;
+    // svg.style.pft = pftNonZero;
+    // svg.AddPaths(solution);
+    // svg.SaveToFile("solution_main.svg");//, svg_scale);
+
+    // //finally, show the svg image in the default viewing application (not working)
+    // system("./solution_main.svg"); 
+
+
+    // return new_polygon;
+
+}
+
+
+////////////////////////////////////////////////////////////////////
+std::vector<std::vector<line>> offset_total_polys(std::vector<std::vector<std::vector<line>>> total_polys)
+{
+    std::vector<std::vector<line>> modified_total_polys;
+    std::vector<line> outer_poly = total_polys[0][0];
+    std::vector<vector<line>> hole_polys = total_polys[1];
+
+
+    // modified_total_polys.push_back(offset_poly(outer_poly, EXPAND));
+
+    // if (hole_polys.size() > 0)
+    //     for(int i = 0; i < hole_polys.size(); i++)
+    //         modified_total_polys.push_back(offset_poly(hole_polys[i], SHRINK));
+
+    // return modified_total_polys;
+
+
+    Path subj_outer;
+    Path subj_inner;
+    Paths subj_inner_all;
+    Paths original_outer;
+    Paths solution;
+
+    // Convert to ClipperLib format
+    for(int i = 0; i < outer_poly.size(); i++)
+    {
+        subj_outer << IntPoint(outer_poly[i].p1.x, outer_poly[i].p1.y);
+        subj_outer << IntPoint(outer_poly[i].p2.x, outer_poly[i].p2.y);
+    }
+    
+    CleanPolygon(subj_outer);
+
+    for(int i = 0; i < hole_polys.size(); i++)
+    {
+        for(int j = 0; j < hole_polys[i].size(); j++)
+        {
+            subj_inner << IntPoint(hole_polys[i][j].p1.x, hole_polys[i][j].p1.y);
+            subj_inner << IntPoint(hole_polys[i][j].p2.x, hole_polys[i][j].p2.y);
+        }
+
+        CleanPolygon(subj_inner);
+        subj_inner_all << subj_inner;
+    }
+
+    ReversePaths(subj_inner_all);
+
+    double miter_limit = 6.0;
+    std::cout << "Miter limit = " << miter_limit << std::endl;
+
+    ClipperOffset co;
+    int offset_val = 3;
+    co.MiterLimit = miter_limit;
+    co.AddPath(subj_outer, jtMiter, etClosedPolygon);
+    co.AddPaths(subj_inner_all, jtMiter, etClosedPolygon);
+    co.Execute(solution, offset_val);
+
+    std::cout << "Solution size: " << solution[0].size() << std::endl;
+
 
     //let's see the result too ...
-    original << subj;
+    original_outer << subj_outer;
 
     SVGBuilder svg;
     svg.style.penWidth = 1.5;
     svg.style.brushClr = 0x1200009C;
     svg.style.penClr = 0xFF000000;
     svg.style.pft = pftNonZero;
-    svg.AddPaths(original);
-    // svg.style.brushClr = 0x129C0000;
-    // svg.style.penClr = 0xCCFFA07A;
-    // svg.style.pft = pftNonZero;
-    // svg.AddPaths(clip);
-    svg.style.brushClr = 0x3000FF00;
-    svg.style.penClr = 0xFF006600;
+    svg.AddPaths(original_outer);
+
+    svg.style.brushClr = 0x1200009C;
+    svg.style.penClr = 0xFF000000;
     svg.style.pft = pftNonZero;
-    svg.AddPaths(solution);
-    svg.SaveToFile("solution_main.svg");//, svg_scale);
+    svg.AddPaths(subj_inner_all);
+    svg.SaveToFile("solution_main_pre.svg");//, svg_scale);
+
+    SVGBuilder svg_2;
+    svg_2.style.brushClr = 0x3000FF00;
+    svg_2.style.penClr = 0xFF006600;
+    svg_2.style.pft = pftEvenOdd;
+    svg_2.AddPaths(solution);
+    svg_2.SaveToFile("solution_main_post.svg");//, svg_scale);
 
     //finally, show the svg image in the default viewing application (not working)
-    system("./solution_main.svg"); 
-
-
-    return new_polygon;
-
+    // system("./solution_main.svg"); 
+   
 }
+
 
 //////////////////////////////////////////////////////////////////////
 ////////////////////////////// Main //////////////////////////////////
@@ -209,25 +296,50 @@ int main(int argc, char** argv)
     square.push_back(l1);
     square.push_back(l2);
     square.push_back(l3);
-    // square.push_back(l4);
+    square.push_back(l4);
 
 
+    std::vector<line> square_2;
+    p1 = {25, 25};
+    p2 = {25, 35};
+    p3 = {35, 35};
+    p4 = {35, 25};
+    l1 = {p1, p2};
+    l2 = {p2, p3};
+    l3 = {p3, p4};
+    l4 = {p4, p1};
+    square_2.push_back(l1);
+    square_2.push_back(l2);
+    square_2.push_back(l3);
+    square_2.push_back(l4);
+
+
+    std::vector<std::vector<std::vector<line>>> total_polys;
     std::vector<line> polygon = square;
 
     std::vector<std::vector<line>> poly_set;
-
     poly_set.push_back(polygon);
 
-    std::vector<line> new_polygon = offset_polygon(polygon, EXPAND);
-    std::cout << "Old polygon size: " << polygon.size() << std::endl;
-    std::cout << "New polygon size: " << new_polygon.size() << std::endl;
-    // new_polygon = reorder_cuts(new_polygon);
-    poly_set.push_back(new_polygon);
+    
+    total_polys.push_back(poly_set);
 
-    // poly_set.clear();
-    int xlims[2] = {0, 120};
-    int ylims[2] = {0, 120};
-    plot_poly_set(poly_set, xlims, ylims);
+    poly_set.clear();
+    poly_set.push_back(square_2);
+    total_polys.push_back(poly_set);
+
+    offset_total_polys(total_polys);
+
+
+    // std::vector<line> new_polygon = offset_polygon(polygon, EXPAND);
+    // std::cout << "Old polygon size: " << polygon.size() << std::endl;
+    // std::cout << "New polygon size: " << new_polygon.size() << std::endl;
+    // // new_polygon = reorder_cuts(new_polygon);
+    // poly_set.push_back(new_polygon);
+
+    // // poly_set.clear();
+    // int xlims[2] = {0, 120};
+    // int ylims[2] = {0, 120};
+    // plot_poly_set(poly_set, xlims, ylims);
 
     return 0;
 
