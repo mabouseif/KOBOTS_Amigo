@@ -7,6 +7,15 @@
 #include <cmath>
 #include <math.h>
 #include "matplotlibcpp.h"
+#include "clipper.hpp"  
+
+
+
+
+
+#define SHRINK 0
+#define EXPAND 1
+
 
 /* The point struct has an extra operator == function because it is required 
  when creating unordered maps with custom classes/structs
@@ -42,6 +51,15 @@ struct line
         if (p1.y > p2.y)
             return p1;
         else return p2;
+    }
+
+    point get_higher_point_x_wise()
+    {
+        if (p1.x > p2.x)
+            return p1;
+        else if (p1.x < p2.x)
+            return p2;
+        else return this->get_higher_point_y_wise();
     }
 
     void switch_points()
@@ -128,3 +146,7 @@ size_t get_cost_arr_new(int** perms, unsigned long long n_perms, int n_elements,
 std::vector<std::vector<int> > create_truth_table(const unsigned n);
 
 void switch_line_points(std::vector<line>& line_set, std::vector<int> line_indicies, std::vector<int> truth_table_input);
+
+std::vector<std::vector<line>> offset_total_polys(std::vector<std::vector<std::vector<line>>> total_polys, int mode);
+
+std::vector<line> reorder_lines_into_chain(std::vector<line> poly);

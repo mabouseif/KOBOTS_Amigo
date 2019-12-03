@@ -15,6 +15,12 @@ namespace plt = matplotlibcpp;
 */
 
 
+
+
+/////////////////////////////////////////////////////////////////////////////
+////////////////////////////// Polygon-related START //////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
 struct point p;
 
 struct line l;
@@ -93,14 +99,14 @@ bool is_polygon(std::vector<line> line_set)
 
 
 /////////////////////////////////////////////////////////////////////////////
-////////////////////////////// Polygon-related end //////////////////////////
+////////////////////////////// Polygon-related END //////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
 
 
 
 /////////////////////////////////////////////////////////////////////////////
-////////////////////////////// Final Line-related start /////////////////////
+////////////////////////////// Final Line-related START /////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -272,13 +278,13 @@ std::vector<int> get_index_of_final_line_and_starting_vertex(std::vector<line> l
 
 
 /////////////////////////////////////////////////////////////////////////////
-////////////////////////////// Final Line-related end ///////////////////////
+////////////////////////////// Final Line-related END ///////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
 
 
 /////////////////////////////////////////////////////////////////////////////
-////////////////////////////// Stacked Horizontal lines-related start /////////
+////////////////////////////// Stacked Horizontal lines-related START /////////
 /////////////////////////////////////////////////////////////////////////////
 
 std::vector<std::vector<line>> reorder_board_wide_polys(std::map<int, custom_arr_type> board_wide_polygon_map, std::vector<std::vector<line>> poly_set_copy)
@@ -441,14 +447,14 @@ void plot_poly_set(std::vector<std::vector<line>> poly_set, int xlims[2], int yl
 
 
 /////////////////////////////////////////////////////////////////////////////
-////////////////////////////// Stacked Horizontal lines-related end /////////
+////////////////////////////// Stacked Horizontal lines-related END /////////
 /////////////////////////////////////////////////////////////////////////////
 
 
 
 
 /////////////////////////////////////////////////////////////////////////////
-////////////////////////////// Ordering Lines-related start /////////////////
+////////////////////////////// Ordering Lines-related START /////////////////
 /////////////////////////////////////////////////////////////////////////////
 
 int get_factorial(unsigned int n)
@@ -622,71 +628,121 @@ void print_lines(std::vector<line> line_set)
 }
 
 
+
+std::vector<line> reorder_lines_into_chain(std::vector<line> poly)
+{
+    std::vector<line> reordered_lines;
+    std::vector<int> final_idx_vec = get_index_of_final_line_and_starting_vertex(poly);
+    reorder_points(poly);
+    point p_compare;
+    line final_line = poly[final_idx_vec[0]];
+    p_compare = poly[final_idx_vec[0]].get_higher_point_x_wise();
+
+    poly.erase(poly.begin()+final_idx_vec[0]);
+
+    int j = 0;
+    while (poly.size() > 0)
+    {
+        if (p_compare == poly[j].p1)
+        {
+            reordered_lines.push_back(poly[j]);
+            p_compare = poly[j].p2;
+            poly.erase(poly.begin()+j);
+            j = 0;
+        }
+        else if (p_compare == poly[j].p2)
+        {
+            reordered_lines.push_back(poly[j]);
+            p_compare = poly[j].p1;
+            poly.erase(poly.begin()+j);
+            j = 0;
+        }
+        else j++;
+
+    }
+
+    reordered_lines.push_back(final_line);
+
+    return reordered_lines;
+}
+
+
 std::vector<line> reorder_cuts(std::vector<line> line_set)
 {
     std::vector<line> reordered_lines;
-    std::vector<int> final_idx_vec = get_index_of_final_line_and_starting_vertex(line_set);
-    int final_line_idx = final_idx_vec[0];
-    int final_line_starting_vertex_index = final_idx_vec[1];
-    std::cout << "Final line index: " << final_line_idx << std::endl;
 
-    // print_lines(line_set);
-    std::cout << std::endl;
-    
-    reorder_points(line_set);
-
-    print_lines(line_set);
-    std::cout << "---------------------" << std::endl;
-
-    line final_line = line_set[final_line_idx];
-    
-
-    int a[line_set.size()-1] = {};
-    int j;
-    for (int i = 0; i < line_set.size(); i++)
+    if (line_set.size() > 11)
     {
-        j = i;
-        if (i >= final_line_idx)
-            j++;
-        a[i] = j;
-    }       
+        std::cout << "Reordering sequentially.." << std::endl;
+        reordered_lines = reorder_lines_into_chain(line_set);
+    }
+    else
+    {
+        std::cout << "Reordering cost-wise.." << std::endl;
+        std::vector<int> final_idx_vec = get_index_of_final_line_and_starting_vertex(line_set);
+        int final_line_idx = final_idx_vec[0];
+        int final_line_starting_vertex_index = final_idx_vec[1];
+        std::cout << "Final line index: " << final_line_idx << std::endl;
 
-    int n_elements = sizeof(a) / sizeof(a[0]);
+        // print_lines(line_set);
+        std::cout << std::endl;
+        
+        reorder_points(line_set);
 
-    unsigned long long n_perms = get_factorial(n_elements);
+        print_lines(line_set);
+        std::cout << "---------------------" << std::endl;
 
-    clock_t begin = std::clock();
-    int** perms = find_permutations(a, n_elements, n_perms, final_line_idx); 
-    clock_t end = std::clock();
-    std::cout << "Elapsed time for finding permutations: " << double(end-begin)/ CLOCKS_PER_SEC << std::endl;
+        line final_line = line_set[final_line_idx];
+        
 
-    n_elements++;
+        int a[line_set.size()-1] = {};
+        int j;
+        for (int i = 0; i < line_set.size(); i++)
+        {
+            j = i;
+            if (i >= final_line_idx)
+                j++;
+            a[i] = j;
+        }       
 
-    // print_perms(perms, n_perms, n_elements);
+        int n_elements = sizeof(a) / sizeof(a[0]);
 
-    print_lines(line_set);
-    std::cout << std::endl;
+        unsigned long long n_perms = get_factorial(n_elements);
+
+        clock_t begin = std::clock();
+        int** perms = find_permutations(a, n_elements, n_perms, final_line_idx); 
+        clock_t end = std::clock();
+        std::cout << "Elapsed time for finding permutations: " << double(end-begin)/ CLOCKS_PER_SEC << std::endl;
+
+        n_elements++;
+
+        // print_perms(perms, n_perms, n_elements);
+
+        print_lines(line_set);
+        std::cout << std::endl;
 
 
 
-    begin = std::clock();
-    // get_cost_arr
-    size_t min_idx = get_cost_arr_new(perms, n_perms, n_elements, line_set);
-    end = std::clock();
-    std::cout << "Elapsed time for calculating cost of all permutations and finding the minimum value index: " << double(end-begin)/ CLOCKS_PER_SEC << std::endl;
+        begin = std::clock();
+        // get_cost_arr
+        size_t min_idx = get_cost_arr_new(perms, n_perms, n_elements, line_set);
+        end = std::clock();
+        std::cout << "Elapsed time for calculating cost of all permutations and finding the minimum value index: " << double(end-begin)/ CLOCKS_PER_SEC << std::endl;
 
-    for (int i = 0; i< n_elements; i++)
-        reordered_lines.push_back(line_set[perms[min_idx][i]]);
+        for (int i = 0; i< n_elements; i++)
+            reordered_lines.push_back(line_set[perms[min_idx][i]]);
 
-    std::cout << "Best permutation: ";
-    for (int i = 0; i < n_elements; i++)
-        std::cout << perms[min_idx][i] << " ";
-    // std::cout << final_line_idx << std::endl;
-    std::cout << std::endl;
+        std::cout << "Best permutation: ";
+        for (int i = 0; i < n_elements; i++)
+            std::cout << perms[min_idx][i] << " ";
+        // std::cout << final_line_idx << std::endl;
+        std::cout << std::endl;
 
-    for (size_t i = 0; i < n_perms; i++)
-        free(perms[i]);
-    free(perms);
+        for (size_t i = 0; i < n_perms; i++)
+            free(perms[i]);
+        free(perms);
+    }
+
 
     return reordered_lines;
 
@@ -721,6 +777,8 @@ size_t get_cost_arr_new(int** perms, unsigned long long n_perms, int n_elements,
     // Create truth_table
     std::vector<std::vector<int>> truth_table = create_truth_table(flat_line_indices.size());
 
+    
+
     std::vector<line> line_set_copy;
     double cost;
     int min_cost_perm_idx;
@@ -752,6 +810,7 @@ size_t get_cost_arr_new(int** perms, unsigned long long n_perms, int n_elements,
     }
 
     switch_line_points(line_set, flat_line_indices, truth_table[truth_table_min_cost_idicies[min_cost_perm_idx]]);
+    
 
     free(truth_table_min_cost_idicies);
     free(cost_arr);
@@ -766,9 +825,9 @@ std::vector<std::vector<int> > create_truth_table(const unsigned n)
     std::vector<std::vector<int> > output(n, std::vector<int>(1 << n));
 
     unsigned num_to_fill = 1U << (n - 1);
-    for(unsigned col = 0; col < n; ++col, num_to_fill >>= 1U)
+    for (unsigned col = 0; col < n; ++col, num_to_fill >>= 1U)
     {
-        for(unsigned row = num_to_fill; row < (1U << n); row += (num_to_fill * 2))
+        for (unsigned row = num_to_fill; row < (1U << n); row += (num_to_fill * 2))
         {
             std::fill_n(&output[col][row], num_to_fill, 1);
         }
@@ -776,7 +835,7 @@ std::vector<std::vector<int> > create_truth_table(const unsigned n)
 
     return output;
 
-    // // These loops just print out the results, nothing more.
+    // // This loop just print out the results, nothing more.
     // for(unsigned x = 0; x < (1 << n); ++x)
     // {
     //     for(unsigned y = 0; y < n; ++y)
@@ -789,7 +848,11 @@ std::vector<std::vector<int> > create_truth_table(const unsigned n)
 
 void switch_line_points(std::vector<line>& line_set, std::vector<int> line_indicies, std::vector<int> truth_table_input)
 {
-    for(int i = 0; i < line_indicies.size(); i++)
+    std::cout << line_set.size() << std::endl;
+    std::cout << line_indicies.size() << std::endl;
+    std::cout << truth_table_input.size() << std::endl;
+
+    for (int i = 0; i < line_indicies.size(); i++)
     {
         if (truth_table_input[i] == 1)
         {
@@ -799,9 +862,148 @@ void switch_line_points(std::vector<line>& line_set, std::vector<int> line_indic
 }
 
 /////////////////////////////////////////////////////////////////////////////
-////////////////////////////// Ordering Lines-related end ///////////////////
+////////////////////////////// Ordering Lines-related END ///////////////////
 /////////////////////////////////////////////////////////////////////////////
 
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////// Tool Diamater Compensation-related START ////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+
+std::vector<std::vector<line>> offset_total_polys(std::vector<std::vector<std::vector<line>>> total_polys, int mode)
+{
+    std::vector<line> outer_poly = total_polys[0][0];
+    std::vector<std::vector<line>> hole_polys = total_polys[1];
+    int offset_val;
+
+
+    switch(mode)
+    {
+        case(0): 
+            offset_val = -3;
+            std::cout << "Shrinking polygon by offset " << offset_val << std::endl;
+            break;
+        
+        case(1):
+            offset_val = 3;
+            std::cout << "Expanding polygon by offset " << offset_val << std::endl;
+            break;
+
+        default:
+            std::cout << "Invalid offset mode!" << std::endl;
+            exit (EXIT_FAILURE);
+    }
+
+    ClipperLib::Path subj_outer;
+    ClipperLib::Path subj_inner;
+    ClipperLib::Paths subj_inner_all;
+    ClipperLib::Paths original_outer;
+    ClipperLib::Paths solution;
+
+    // Convert enclosing polygon to ClipperLib format
+    for (int i = 0; i < outer_poly.size(); i++)
+    {
+        subj_outer << ClipperLib::IntPoint(outer_poly[i].p1.x, outer_poly[i].p1.y);
+        subj_outer << ClipperLib::IntPoint(outer_poly[i].p2.x, outer_poly[i].p2.y);
+    }
+    
+    // Clean enclosing polygon
+    ClipperLib::CleanPolygon(subj_outer);
+
+    // Convert hole polygons to ClipperLib format
+    for (int i = 0; i < hole_polys.size(); i++)
+    {
+        for (int j = 0; j < hole_polys[i].size(); j++)
+        {
+            subj_inner << ClipperLib::IntPoint(hole_polys[i][j].p1.x, hole_polys[i][j].p1.y);
+            subj_inner << ClipperLib::IntPoint(hole_polys[i][j].p2.x, hole_polys[i][j].p2.y);
+        }
+        // Clean hole polygons
+        ClipperLib::CleanPolygon(subj_inner);
+        subj_inner_all << subj_inner;
+        subj_inner.clear();
+    }
+
+    // Reverse orientation of holy polygons (opposite of enclosing polygon) in order to define them as holes
+    ClipperLib::ReversePaths(subj_inner_all);
+
+    // Solve
+    double miter_limit = 2.0; // Minimum is 2.0. Used during expansion.
+    ClipperLib::ClipperOffset co;
+    co.MiterLimit = miter_limit;
+    co.AddPath(subj_outer, ClipperLib::jtMiter, ClipperLib::etClosedPolygon);
+    co.AddPaths(subj_inner_all, ClipperLib::jtMiter, ClipperLib::etClosedPolygon);
+    co.Execute(solution, offset_val);
+
+    std::cout << "Miter limit = " << miter_limit << std::endl;
+    std::cout << "Solution size: " << solution.size() << std::endl;
+    
+
+
+    // Convert solution back to normal format
+    std::vector<std::vector<line>> modified_poly_set;
+    std::vector<line> temp_poly;
+    line temp_line; 
+    point p1;
+    point p2;     
+    int n; 
+
+    for (int i = 0; i < solution.size(); i++)
+    {
+        temp_poly.clear();
+        n = solution[i].size();
+
+        for (int j = 0; j < solution[i].size(); j++)
+        {
+            p1.x = solution[i][j].X; p1.y = solution[i][j].Y;
+            p2.x = solution[i][(j+1)%n].X; p2.y = solution[i][(j+1)%n].Y;
+            temp_line.p1 = p1; temp_line.p2 = p2;
+            temp_poly.push_back(temp_line);
+        }
+
+        modified_poly_set.push_back(temp_poly);
+    }
+
+
+    return modified_poly_set;
+
+
+    // // "Drawing" the result
+    // original_outer << subj_outer;
+
+    // SVGBuilder svg;
+    // svg.style.penWidth = 1.5;
+    // svg.style.brushClr = 0x1200009C;
+    // svg.style.penClr = 0xFF000000;
+    // svg.style.pft = pftNonZero;
+    // svg.AddPaths(original_outer);
+
+    // svg.style.brushClr = 0x1200009C;
+    // svg.style.penClr = 0xFF000000;
+    // svg.style.pft = pftNonZero;
+    // svg.AddPaths(subj_inner_all);
+    // svg.SaveToFile("./clipping/solution_main_pre.svg");//, svg_scale);
+
+    // SVGBuilder svg_2;
+    // svg_2.style.brushClr = 0x3000FF00;
+    // svg_2.style.penClr = 0xFF006600;
+    // svg_2.style.pft = pftEvenOdd;
+    // svg_2.AddPaths(solution);
+    // svg_2.SaveToFile("./clipping/solution_main_post.svg");//, svg_scale);
+
+    //finally, show the svg image in the default viewing application (not working)
+    // system("./solution_main.svg"); 
+
+}
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////// Tool Diamater Compensation-related END ////////////////
+/////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////

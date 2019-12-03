@@ -2,9 +2,9 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN"
 "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
 
-<svg width="46px" height="46px" viewBox="0 0 46 46" version="1.0" xmlns="http://www.w3.org/2000/svg">
+<svg width="86px" height="86px" viewBox="0 0 86 86" version="1.0" xmlns="http://www.w3.org/2000/svg">
 
- <path d=" M 36.00 36.00 L 10.00 36.00 L 10.00 10.00 L 36.00 10.00 z M 21.00 21.00 L 21.00 25.00 L 25.00 25.00 L 25.00 21.00 z"
+ <path d=" M 76.00 76.00 L 10.00 76.00 L 10.00 10.00 L 76.00 10.00 z M 50.00 46.00 L 53.00 49.00 L 56.00 46.00 z M 31.00 31.00 L 31.00 35.00 L 35.00 35.00 L 35.00 31.00 z"
  style="fill:#00ff00; fill-opacity:0.19; fill-rule:evenodd; stroke:#006600; stroke-opacity:1.00; stroke-width:0.80;"/>
 
 </svg>

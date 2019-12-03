@@ -80,7 +80,7 @@ int main(int argc, char** argv)
     line l9 = {p19, p20};
     line l10 = {p20, p21};
     line l11 = {p21, p11};
-    line l12 = {p22, p23};
+    // line l12 = {p22, p23};
 
     std::vector<line> kings_crown;
     kings_crown.push_back(l1);
@@ -107,8 +107,10 @@ int main(int argc, char** argv)
     triangle.push_back(l2);
     triangle.push_back(l3);
 
-    // stacked_horizontals_w_square.push_back(kings_crown);
-    stacked_horizontals_w_square.push_back(triangle);
+    stacked_horizontals_w_square.push_back(kings_crown);
+
+    // stacked_horizontals_w_square.clear();
+    // stacked_horizontals_w_square.push_back(triangle);
     
 
     std::cout << "poly set size before: " << stacked_horizontals_w_square.size() << std::endl;
