@@ -9,16 +9,16 @@ or if you want to only run:
 
 for the stacked board-wide polys test:
 ```
-g++ ../helper_functions.cpp stacked_horizontals_test.cpp -o stacked_horizontals_test -std=c++11 -I/usr/include/python2.7 -lpython2.7 && ./stacked_horizontals_test
+g++ ../helper_functions.cpp test_stacked_horizontals.cpp -o test_stacked_horizontals -std=c++11 -I/usr/include/python2.7 -lpython2.7 && ./test_stacked_horizontals
 ```
 or if you want to only run:
 ```
-./stacked_horizontals_test
+./test_stacked_horizontals
 ```
 
 For running valgrind memory-leak and other checks (comment out plotting matplotlib-based plotting function):
 ```
-g++ -g ../helper_functions.cpp stacked_horizontals_test.cpp -o stacked_horizontals_test -std=c++11 -I/usr/include/python2.7 -lpython2.7 && valgrind --leak-check=yes --track-origins=yes --dsymutil=yes ./stacked_horizontals_test
+g++ -g ../helper_functions.cpp test_stacked_horizontals.cpp -o test_stacked_horizontals -std=c++11 -I/usr/include/python2.7 -lpython2.7 && valgrind --leak-check=yes --track-origins=yes --dsymutil=yes ./test_stacked_horizontals
 ```
 
 

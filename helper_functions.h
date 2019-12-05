@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <iostream>
+#include <string>
 #include <vector>
 #include <unordered_map>
 #include <bits/stdc++.h> 
@@ -131,8 +132,6 @@ void print_lines(std::vector<line> line_set);
 
 double euc_dist(line l1, line l2);
 
-size_t get_cost_arr(int** perms, unsigned long long n_perms, int n_elements, std::vector<line> line_set);
-
 void reorder_points(std::vector<line>& line_set);
 
 std::vector<line> reorder_cuts(std::vector<line> line_set);
@@ -145,7 +144,7 @@ size_t get_cost_arr_new(int** perms, unsigned long long n_perms, int n_elements,
 
 std::vector<std::vector<int> > create_truth_table(const unsigned n);
 
-void switch_line_points(std::vector<line>& line_set, std::vector<int> line_indicies, std::vector<int> truth_table_input);
+void switch_flat_line_points(std::vector<line>& line_set, std::vector<int> line_indicies, std::vector<int> truth_table_input);
 
 std::vector<std::vector<line>> offset_total_polys(std::vector<std::vector<std::vector<line>>> total_polys, int mode);
 

@@ -6,33 +6,37 @@ int main(int argc, char** argv)
     // This is here because "true" and "false" are printed out as 1 and 0, whereas this fixes it.
     std::cout.setf(std::ios::boolalpha);
 
-    point p1 = {2, 2};
-    point p2 = {2, 4};
-    point p3 = {4, 4};
-    point p4 = {4, 2};
-    point p5 = {2, 6};
-    point p6 = {4, 6};
-    point p7 = {2, 2};
-    point p8 = {2, 4};
-    point p9 = {3, 4};
-    point p10 = {3, 2};
+    point p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, 
+    p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21, p22, p23;
 
-    line l1 = {p2, p3};
-    line l2 = {p4, p1};
-    line l3 = {p5, p6};
+    line l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12;
 
-    line l4 = {p7, p8};
-    line l5 = {p8, p9};
-    line l6 = {p9, p10};
-    line l7 = {p10, p7};
+    std::vector<line> kings_crown, triangle, square, square_2, 
+    polygon_1, polygon_2, polygon_3, polygon_small_square;
 
-    std::vector<std::vector<line>> stacked_horizontals;
-    std::vector<std::vector<line>> stacked_horizontals_w_square;
+    std::vector<std::vector<line>> stacked_horizontals, stacked_horizontals_w_square;
 
-    std::vector<line> polygon_1;
-    std::vector<line> polygon_2;
-    std::vector<line> polygon_3;
-    std::vector<line> polygon_small_square;
+
+    p1 = {2, 2};
+    p2 = {2, 4};
+    p3 = {4, 4};
+    p4 = {4, 2};
+    p5 = {2, 6};
+    p6 = {4, 6};
+    p7 = {2, 2};
+    p8 = {2, 4};
+    p9 = {3, 4};
+    p10 = {3, 2};
+
+    l1 = {p2, p3};
+    l2 = {p4, p1};
+    l3 = {p5, p6};
+    l4 = {p7, p8};
+    l5 = {p8, p9};
+    l6 = {p9, p10};
+    l7 = {p10, p7};
+
+
     
 
     polygon_1.push_back(l1);
@@ -55,19 +59,19 @@ int main(int argc, char** argv)
     stacked_horizontals_w_square.push_back(polygon_3);
 
 
-    point p11 = {0, 0};
-    point p12 = {1, 5};
-    point p13 = {2, 3};
-    point p14 = {3, 5};
-    point p15 = {4, 3};
-    point p16 = {5, 5};
-    point p17 = {6, 3};
-    point p18 = {7, 5};
-    point p19 = {8, 3};
-    point p20 = {9, 5};
-    point p21 = {10, 0};
-    point p22 = {11, 5};
-    point p23 = {12, 0};
+    p11 = {0, 0};
+    p12 = {1, 5};
+    p13 = {2, 3};
+    p14 = {3, 5};
+    p15 = {4, 3};
+    p16 = {5, 5};
+    p17 = {6, 3};
+    p18 = {7, 5};
+    p19 = {8, 3};
+    p20 = {9, 5};
+    p21 = {10, 0};
+    p22 = {11, 5};
+    p23 = {12, 0};
 
     l1 = {p11, p12};
     l2 = {p12, p13};
@@ -76,13 +80,12 @@ int main(int argc, char** argv)
     l5 = {p15, p16};
     l6 = {p16, p17};
     l7 = {p17, p18};
-    line l8 = {p18, p19};
-    line l9 = {p19, p20};
-    line l10 = {p20, p21};
-    line l11 = {p21, p11};
-    // line l12 = {p22, p23};
+    l8 = {p18, p19};
+    l9 = {p19, p20};
+    l10 = {p20, p21};
+    l11 = {p21, p11};
+    // l12 = {p22, p23};
 
-    std::vector<line> kings_crown;
     kings_crown.push_back(l1);
     kings_crown.push_back(l2);
     kings_crown.push_back(l3);
@@ -95,7 +98,6 @@ int main(int argc, char** argv)
     kings_crown.push_back(l10);
     kings_crown.push_back(l11);
 
-    std::vector<line> triangle;
     p1 = {2, 7};
     p2 = {2, 9};
     p3 = {4, 7};

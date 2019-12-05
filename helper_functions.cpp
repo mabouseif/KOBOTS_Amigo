@@ -287,6 +287,8 @@ std::vector<int> get_index_of_final_line_and_starting_vertex(std::vector<line> l
 ////////////////////////////// Stacked Horizontal lines-related START /////////
 /////////////////////////////////////////////////////////////////////////////
 
+#if 0
+
 std::vector<std::vector<line>> reorder_board_wide_polys(std::map<int, custom_arr_type> board_wide_polygon_map, std::vector<std::vector<line>> poly_set_copy)
 {
     std::vector<std::vector<line>> reordered_board_wide_polys;
@@ -406,6 +408,118 @@ std::map<int, custom_arr_type> board_wide_poly(std::vector<std::vector<line>>& p
     // Since poly_set is passed by reference, it is modified accordingly.
     return board_wide_polygon_map;  
 }
+
+#endif 
+
+
+bool is_border_poly(std::vector<line> polygon, const int board_height, const int board_width)
+{
+    int x1, x2, y1, y2;
+    std::unordered_map<int, std::string> point_to_border_map;
+    std::pair<int, std::string> p;
+
+    for (int i = 0; i < polygon.size(); i++)
+    {
+        x1 = polygon[i].p1.x; y1 = polygon[i].p1.y; x2 = polygon[i].p2.x; y2 = polygon[i].p2.y;
+        if (x1 == 0) 
+            ((y1 == 0) || (y1 == board_height)) ? p = {i+10, "left"} : p = {i+10, "left"};
+
+        // if ((x1 == board_width) || (x2 == board_width) || (y1 == board_height) || (y2 == board_height)) 
+    }
+}
+
+
+std::map<int, custom_arr_type> board_wide_poly(std::vector<std::vector<line>>& poly_set, const int board_height, const int board_width)
+{
+
+    std::map<int, custom_arr_type> board_wide_polygon_map;
+    std::pair<int, custom_arr_type> p;
+    int poly_idx, line_idx, y_value;
+    std::vector<line> polygon;
+    std::vector<int> polygons_board_wide_idx;
+    std::vector<int> polygons_board_wide_y_val_keys;
+    custom_arr_type my_arr;
+    for (int i = 0; i < poly_set.size(); i++)
+    {
+        polygon = poly_set[i];
+        for (int j = 0; j < polygon.size(); j++)
+            {
+                if (std::abs(polygon[j].p1.x - polygon[j].p2.x) == board_width)
+                {
+                    poly_idx = i; line_idx = j; y_value = polygon[j].get_higher_point_y_wise().y;
+                    polygons_board_wide_idx.push_back(poly_idx);
+                    polygons_board_wide_y_val_keys.push_back(y_value);
+                    my_arr = {poly_idx, line_idx};
+                    board_wide_polygon_map.insert(std::make_pair(y_value, my_arr));
+                }  
+            }
+    }
+    // board-wide polys indicies in poly_set sorted in ascending order
+    std::sort(polygons_board_wide_idx.begin(), polygons_board_wide_idx.end());
+    for (std::vector<int>::iterator it=polygons_board_wide_idx.begin(); it != polygons_board_wide_idx.end(); it++)
+        std::cout << *it << std::endl;
+
+    // By here you have (sorted in ascending order)
+    // the y-val, {poly_idx, line_idx} map of the board-wide polys
+
+    // Now remove those board-wide polys from poly_set, which is passed by REFERENCE!
+    int n = polygons_board_wide_idx.size();
+    int compare_idx;
+    std::vector<std::vector<line>> poly_set_copy = poly_set;
+    std::cout << "poly_set_copy size is " << poly_set_copy.size() << std::endl;
+    if (board_wide_polygon_map.size() > 0)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            compare_idx = n-1-i;
+            std::cout << "compare_idx: " << compare_idx << std::endl;
+            std::cout << "polygons_board_wide_idx[compare_idx]: " << polygons_board_wide_idx[compare_idx] << std::endl;
+            for (std::vector<std::vector<line>>::iterator it = poly_set.begin(); it != poly_set.end(); it++)
+            {
+                if ((*it) == poly_set_copy[polygons_board_wide_idx[compare_idx]])
+                {   
+                    // it->clear();
+                    poly_set.erase(it);
+                    break; // The break was necessary, because when you erase an element, the vector decreases in size,
+                           // but you have the stop condition at vector.end(), which is already set before loop entry.
+                }
+                    
+            }
+        }
+    }
+    // Now that the poly set is normal, reorder cuts of the polyset
+    std::cout << "poly_set.size() = " << poly_set.size() << std::endl;
+    for (int i = 0; i < poly_set.size(); i++)
+        poly_set[i] = reorder_cuts(poly_set[i]);
+
+    // Reorder board-wide polygons
+    /* TODO: 1 - Normal case, where all lines are horizontal, only line per poly (done)
+             2 - Polygon has multiple lines, and there's one which is board-wide
+             3 - Multiple board-wide lines in the polygon
+    */
+   std::vector<std::vector<line>> reordered_board_wide_polys = reorder_board_wide_polys( board_wide_polygon_map, poly_set_copy);
+   for (int i =0; i < reordered_board_wide_polys.size(); i++)
+        poly_set.push_back(reordered_board_wide_polys[i]);
+
+//    for (std::map<int, custom_arr_type>::reverse_iterator rev_it = board_wide_polygon_map.rbegin(); rev_it != board_wide_polygon_map.rend(); ++rev_it)
+//         {
+//             std::cout << "Index of poly during reappending (reverse iterator part): " << (*rev_it).second[0] << std::endl;
+//             poly_set.push_back(poly_set_copy[(*rev_it).second[0]]);
+//         }
+    
+    for (int i = 0; i < poly_set.size(); i++)
+    {
+        std::cout << "----------" << std::endl;
+        for (int j = 0; j < poly_set[i].size(); j++)
+            poly_set[i][j].print_points();
+    }
+        
+    // Actually, returning the map is just for viewing purposes.
+    // Since poly_set is passed by reference, it is modified accordingly.
+    return board_wide_polygon_map;  
+}
+
+
 
 
 
@@ -531,53 +645,6 @@ double euc_dist(line l1, line l2)
     double term2 = pow(y_diff, 2);
     return double(std::sqrt(term1 + term2));
 }
-
-size_t get_cost_arr(int** perms, unsigned long long n_perms, int n_elements, std::vector<line> line_set)
-{
-    /*
-        Should also append all indices of permutations that are resulting 
-        in minimum cost and pick the one that would be more optimal when
-        trying to optimize for multiple polygons at the same time.
-    */
-
-    double* cost_arr = (double*)malloc(n_perms * sizeof(double));
-
-    double min_cost = DBL_MAX;
-    size_t min_idx;
-    int final_line_idx = perms[0][n_elements-1];
-    std::cout << "Final line index printed from get_cost function is: " << final_line_idx << std::endl;
-    std::cout << "n_elements: " << n_elements << std::endl;
-    for (unsigned long long i = 0; i < n_perms; i++)
-    {
-        cost_arr[i] = 0;
-        for (int j = 0; j < n_elements-1; j++)
-        {   
-            // std::cout << perms[i][j] << " to " << perms[i][j+1] << std::endl;
-            // line_set[perms[i][j]].print_points();
-            // line_set[perms[i][j+1]].print_points();
-            // std::cout << euc_dist(line_set[perms[i][j]], line_set[perms[i][j+1]]) << std::endl;
-
-            cost_arr[i] += euc_dist(line_set[perms[i][j]], line_set[perms[i][j+1]]);
-
-        }
-        // std::cout << "cost: " << cost_arr[i] << std::endl;
-        
-        if (cost_arr[i] < min_cost)
-        {
-            min_cost = cost_arr[i];
-            min_idx = i;
-        }
-    }
-
-    std::cout << "Minimum Cost is " << min_cost << std::endl;
-
-    free(cost_arr);
-    std::cout << "Cost array freed (supposedly)" << std::endl;
-
-    return min_idx;
-
-}
-
 
 
 void reorder_points(std::vector<line>& line_set)
@@ -721,8 +788,6 @@ std::vector<line> reorder_cuts(std::vector<line> line_set)
         print_lines(line_set);
         std::cout << std::endl;
 
-
-
         begin = std::clock();
         // get_cost_arr
         size_t min_idx = get_cost_arr_new(perms, n_perms, n_elements, line_set);
@@ -760,13 +825,14 @@ size_t get_cost_arr_new(int** perms, unsigned long long n_perms, int n_elements,
     double* cost_arr = (double*)malloc(n_perms * sizeof(double));
     memset(cost_arr, 999999, sizeof(cost_arr));
 
-    int* truth_table_min_cost_idicies = (int*)malloc(n_perms * sizeof(int));
-
     double min_cost = DBL_MAX;
-    size_t min_idx;
     int final_line_idx = perms[0][n_elements-1];
+    int min_cost_perm_idx;
+    double cost;
+
     std::cout << "Final line index printed from get_cost function is: " << final_line_idx << std::endl;
     std::cout << "n_elements: " << n_elements << std::endl;
+
 
     // Get flat line indices
     std::vector<int> flat_line_indices;
@@ -774,45 +840,67 @@ size_t get_cost_arr_new(int** perms, unsigned long long n_perms, int n_elements,
         if (line_set[i].is_flat())
             flat_line_indices.push_back(i);
     
-    // Create truth_table
-    std::vector<std::vector<int>> truth_table = create_truth_table(flat_line_indices.size());
-
-    
-
-    std::vector<line> line_set_copy;
-    double cost;
-    int min_cost_perm_idx;
-    for (unsigned long long i = 0; i < n_perms; i++)
+    // Calculate cost (if poly without flat lines case, else poly with flat lines)
+    if (flat_line_indices.size() == 0)
     {
-        for (int j = 0; j < truth_table.size(); j++)
+        for (unsigned long long i = 0; i < n_perms; i++)
         {
-            line_set_copy = line_set;
-            switch_line_points(line_set_copy, flat_line_indices, truth_table[j]);
-
             cost = 0;
-            for (int k = 0; k < n_elements-1; k++)
-            {
-                cost += euc_dist(line_set_copy[perms[i][k]], line_set_copy[perms[i][k+1]]);
+            for (int j = 0; j < n_elements-1; j++)
+            {   
+                cost += euc_dist(line_set[perms[i][j]], line_set[perms[i][j+1]]);
                 if (cost > min_cost)
                     break;
             }
-            // need to consider/treat the equal case. Either here or on
-            // the previous cost check
+            
             if (cost < min_cost)
             {
                 min_cost = cost;
-                truth_table_min_cost_idicies[i] = j;
-                min_cost_perm_idx = i; // should we have a container for this as well?
-                
+                min_cost_perm_idx = i;
             }
-
         }
     }
+    else 
+    {
+        
+        int* truth_table_min_cost_idicies = (int*)malloc(n_perms * sizeof(int));
 
-    switch_line_points(line_set, flat_line_indices, truth_table[truth_table_min_cost_idicies[min_cost_perm_idx]]);
-    
+        // Create truth_table
+        std::vector<std::vector<int>> truth_table = create_truth_table(flat_line_indices.size());
 
-    free(truth_table_min_cost_idicies);
+        std::vector<line> line_set_copy;
+        
+        for (unsigned long long i = 0; i < n_perms; i++)
+        {
+            for (int j = 0; j < truth_table.size(); j++)
+            {
+                line_set_copy = line_set;
+                switch_flat_line_points(line_set_copy, flat_line_indices, truth_table[j]);
+
+                cost = 0;
+                for (int k = 0; k < n_elements-1; k++)
+                {
+                    cost += euc_dist(line_set_copy[perms[i][k]], line_set_copy[perms[i][k+1]]);
+                    if (cost > min_cost)
+                        break;
+                }
+                // need to consider/treat the equal case. Either here or on
+                // the previous cost check
+                if (cost < min_cost)
+                {
+                    min_cost = cost;
+                    truth_table_min_cost_idicies[i] = j;
+                    min_cost_perm_idx = i; // should we have a container for this as well?
+                }
+            }
+        }
+
+        switch_flat_line_points(line_set, flat_line_indices, truth_table[truth_table_min_cost_idicies[min_cost_perm_idx]]);
+        
+        free(truth_table_min_cost_idicies);
+
+    }
+
     free(cost_arr);
 
     return min_cost_perm_idx;
@@ -834,31 +922,13 @@ std::vector<std::vector<int> > create_truth_table(const unsigned n)
     }
 
     return output;
-
-    // // This loop just print out the results, nothing more.
-    // for(unsigned x = 0; x < (1 << n); ++x)
-    // {
-    //     for(unsigned y = 0; y < n; ++y)
-    //     {
-    //         std::cout << output[y][x] << " ";
-    //     }
-    //     std::cout << std::endl;
-    // }
 }
 
-void switch_line_points(std::vector<line>& line_set, std::vector<int> line_indicies, std::vector<int> truth_table_input)
+void switch_flat_line_points(std::vector<line>& line_set, std::vector<int> line_indicies, std::vector<int> truth_table_input)
 {
-    std::cout << line_set.size() << std::endl;
-    std::cout << line_indicies.size() << std::endl;
-    std::cout << truth_table_input.size() << std::endl;
-
     for (int i = 0; i < line_indicies.size(); i++)
-    {
         if (truth_table_input[i] == 1)
-        {
             line_set[line_indicies[i]].switch_points();
-        }
-    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
