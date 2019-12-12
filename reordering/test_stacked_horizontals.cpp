@@ -12,7 +12,7 @@ int main(int argc, char** argv)
     line l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12;
 
     std::vector<line> kings_crown, triangle, square, square_2, 
-    polygon_1, polygon_2, polygon_3, polygon_small_square;
+    polygon_1, polygon_2, polygon_3, polygon_small_square, board_wide_square;
 
     std::vector<std::vector<line>> stacked_horizontals, stacked_horizontals_w_square;
 
@@ -40,8 +40,8 @@ int main(int argc, char** argv)
     
 
     polygon_1.push_back(l1);
-    polygon_2.push_back(l2);
-    polygon_3.push_back(l3);
+    polygon_2.push_back(l3);
+    polygon_3.push_back(l2);
     polygon_small_square.push_back(l4);
     polygon_small_square.push_back(l5);
     polygon_small_square.push_back(l6);
@@ -49,13 +49,13 @@ int main(int argc, char** argv)
 
     
 
-    stacked_horizontals.push_back(polygon_1);
-    stacked_horizontals.push_back(polygon_2);
-    stacked_horizontals.push_back(polygon_3);
+    // stacked_horizontals.push_back(polygon_1);
+    // stacked_horizontals.push_back(polygon_2);
+    // stacked_horizontals.push_back(polygon_3);
 
     stacked_horizontals_w_square.push_back(polygon_1);
     stacked_horizontals_w_square.push_back(polygon_2);
-    stacked_horizontals_w_square.push_back(polygon_small_square);
+    // stacked_horizontals_w_square.push_back(polygon_small_square);
     stacked_horizontals_w_square.push_back(polygon_3);
 
 
@@ -98,6 +98,8 @@ int main(int argc, char** argv)
     kings_crown.push_back(l10);
     kings_crown.push_back(l11);
 
+    // stacked_horizontals_w_square.push_back(kings_crown);
+
     p1 = {2, 7};
     p2 = {2, 9};
     p3 = {4, 7};
@@ -109,16 +111,29 @@ int main(int argc, char** argv)
     triangle.push_back(l2);
     triangle.push_back(l3);
 
-    stacked_horizontals_w_square.push_back(kings_crown);
+    stacked_horizontals_w_square.push_back(triangle);
 
-    // stacked_horizontals_w_square.clear();
-    // stacked_horizontals_w_square.push_back(triangle);
+    p1 = {6, 3};
+    p2 = {6, 7};
+    p3 = {8, 7};
+    p4 = {8, 3};
+
+    l1 = {p1, p2};
+    l2 = {p2, p3};
+    l3 = {p3, p4};
+    l4 = {p4, p1};
+    board_wide_square.push_back(l1);
+    board_wide_square.push_back(l2);
+    board_wide_square.push_back(l3);
+    board_wide_square.push_back(l4);
+
+    stacked_horizontals_w_square.push_back(board_wide_square);
     
 
     std::cout << "poly set size before: " << stacked_horizontals_w_square.size() << std::endl;
 
     int board_width = 2;
-    std::map<int, custom_arr_type> my_map = board_wide_poly(stacked_horizontals_w_square, board_width);
+    std::map<int, custom_arr_type> my_map = reorder_final(stacked_horizontals_w_square, board_width);
     std::cout << "Number of polygons with a line that is board-wide: " << my_map.size() << std::endl;
     std::cout << "poly set size after: " << stacked_horizontals_w_square.size() << std::endl;
 

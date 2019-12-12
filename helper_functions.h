@@ -134,9 +134,9 @@ double euc_dist(line l1, line l2);
 
 void reorder_points(std::vector<line>& line_set);
 
-std::vector<line> reorder_cuts(std::vector<line> line_set);
+std::vector<line> reorder_cuts(std::vector<line> line_set, int final_line_idx);
 
-std::map<int, custom_arr_type> board_wide_poly(std::vector<std::vector<line>>& poly_set, const int board_width);
+std::map<int, custom_arr_type> reorder_final(std::vector<std::vector<line>>& poly_set, const int board_width);
 
 void plot_poly_set(std::vector<std::vector<line>> poly_set, int xlims[2], int ylims[2]);
 
