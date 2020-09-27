@@ -1,4 +1,4 @@
-#include "helper_functions.h"
+#include "../include/helper_functions.h"
 
 
 int main(int argc, char** agrv)
@@ -132,7 +132,8 @@ int main(int argc, char** agrv)
     std::cout << "Running.." << std::endl;
 
 
-    std::vector<line> reorderd_sequence = reorder_cuts(square);
+    int random_number = 0;
+    std::vector<line> reorderd_sequence = reorder_cuts(square, random_number);
 
     
 
