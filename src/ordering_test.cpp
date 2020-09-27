@@ -4,7 +4,6 @@
 int main(int argc, char** agrv)
 {
 
-    // This is here because "true" and "false" are printed out as 1 and 0, whereas this fixes it.
     std::cout.setf(std::ios::boolalpha);
 
 

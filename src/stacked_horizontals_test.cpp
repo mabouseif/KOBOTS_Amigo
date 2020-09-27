@@ -3,7 +3,6 @@
 int main(int argc, char** argv)
 {
 
-    // This is here because "true" and "false" are printed out as 1 and 0, whereas this fixes it.
     std::cout.setf(std::ios::boolalpha);
 
     point p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, 

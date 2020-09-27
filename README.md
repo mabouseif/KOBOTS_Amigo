@@ -58,7 +58,7 @@ g++ -std=c++11 ../include/clipper.cpp ../include/helper_functions.cpp -I/usr/inc
 ```
 
 
-### TODO
+### 5. TODO
 
 1. Direction of final line
 2. Direction indicators for visualisation

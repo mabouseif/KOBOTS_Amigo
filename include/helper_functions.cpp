@@ -11,7 +11,7 @@ namespace plt = matplotlibcpp;
 
 
 /////////////////////////////////////////////////////////////////////////////
-////////////////////////////// Polygon-related START //////////////////////////
+////////////////////////////// Polygon-related START ////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
 struct point p;
@@ -30,6 +30,7 @@ void print_map(std::unordered_map<point,int, hash_fn> const &m)
 }
 
 
+// Counts vertices of user-provided shapes
 bool check_points_n_occurences(std::unordered_map<point,int, hash_fn> const &m)
 {
     for (auto const& pair: m) {
@@ -46,6 +47,7 @@ bool check_points_n_occurences(std::unordered_map<point,int, hash_fn> const &m)
 }
 
 
+// Valid polygon check
 bool is_polygon(std::vector<line> line_set)
 {
     std::unordered_map<point, int, hash_fn> point_count;
@@ -92,6 +94,8 @@ bool is_polygon(std::vector<line> line_set)
 /////////////////////////////////////////////////////////////////////////////
 
 
+// Return final line to be cut for the polygon, 
+// along with the vertex to start cutting from.
 std::vector<int> get_index_of_final_line_and_starting_vertex(std::vector<line> line_set)
 {
 
@@ -261,12 +265,13 @@ std::vector<int> get_index_of_final_line_and_starting_vertex(std::vector<line> l
 
 
 
+
 /////////////////////////////////////////////////////////////////////////////
-////////////////////////////// Stacked Horizontal lines-related START /////////
+////////////////////////// Stacked Horizontal lines-related START ///////////
 /////////////////////////////////////////////////////////////////////////////
 
 
-
+// Return order of the shapes to be cut
 std::vector<std::vector<line>> reorder_board_wide_polys(std::map<int, custom_arr_type> board_wide_polygon_map, std::vector<std::vector<line>> poly_set_copy)
 {
     std::vector<std::vector<line>> reordered_board_wide_polys;
@@ -323,9 +328,10 @@ std::vector<std::vector<line>> reorder_board_wide_polys(std::map<int, custom_arr
     return reordered_board_wide_polys;
 }
 
+
+// Reorder cuts, including the final line
 std::map<int, custom_arr_type> reorder_final(std::vector<std::vector<line>>& poly_set, const int board_width)
 {
-    std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA " << board_width << std::endl;
     std::map<int, custom_arr_type> board_wide_polygon_map;
     std::pair<int, custom_arr_type> p;
     int poly_idx, line_idx, y_value;
@@ -406,7 +412,7 @@ std::map<int, custom_arr_type> reorder_final(std::vector<std::vector<line>>& pol
 }
 
 
-
+// Plotting
 void plot_poly_set(std::vector<std::vector<line>> poly_set, int xlims[2], int ylims[2])
 {
     line line_for_plot;
@@ -505,7 +511,7 @@ int** find_permutations(int a[], int n_elements, unsigned long long n_perms, int
     return perms;
 } 
 
-
+// Printing permutations
 void print_perms(int** perms, int count, int n_elements)
 {
     std::cout << "Total count is " << count << std::endl;
@@ -520,6 +526,7 @@ void print_perms(int** perms, int count, int n_elements)
 }
 
 
+// Calculate Euclidian distance
 double euc_dist(line l1, line l2)
 {
     
@@ -531,6 +538,7 @@ double euc_dist(line l1, line l2)
 }
 
 
+// Reorder points for minimal energy waste
 void reorder_points(std::vector<line>& line_set)
 {
     /*
@@ -701,7 +709,7 @@ std::vector<line> reorder_cuts(std::vector<line> line_set, int final_line_idx)
 
 }
 
-
+// Cost calculation of permutation
 size_t get_cost_arr_new(int** perms, unsigned long long n_perms, int n_elements, std::vector<line>& line_set)
 {
     /*
@@ -794,7 +802,7 @@ size_t get_cost_arr_new(int** perms, unsigned long long n_perms, int n_elements,
     return min_cost_perm_idx;
 }
 
-
+// Helper function for cost calculations
 std::vector<std::vector<int> > create_truth_table(const unsigned n)
 {
     // Copied from StackOverflow
@@ -811,6 +819,8 @@ std::vector<std::vector<int> > create_truth_table(const unsigned n)
 
     return output;
 }
+
+
 
 void switch_flat_line_points(std::vector<line>& line_set, std::vector<int> line_indicies, std::vector<int> truth_table_input)
 {
@@ -830,7 +840,7 @@ void switch_flat_line_points(std::vector<line>& line_set, std::vector<int> line_
 /////////////////// Tool Diamater Compensation-related START ////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-
+// Offset points by tool size
 std::vector<std::vector<line>> offset_total_polys(std::vector<std::vector<std::vector<line>>> total_polys, int mode)
 {
     std::vector<line> outer_poly = total_polys[0][0];

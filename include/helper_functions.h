@@ -32,7 +32,6 @@ struct point
     { 
         return (x == other.x && y == other.y);
     }
-    
 
 };
 
@@ -87,7 +86,6 @@ struct line
     {
         return p1.y == p2.y;
     }
-        
 
 };
 
