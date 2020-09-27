@@ -16,6 +16,8 @@ The project depends on two open-source libraries for shape clipping and plotting
 * [**matplotlib-cpp**](https://github.com/lava/matplotlib-cpp): The simplest C++ plotting library. It is built to resemble the plotting API used by Matlab and matplotlib.
 * [**Clipper!**](http://www.angusj.com/delphi/clipper.php): The Clipper library performs line & polygon clipping - intersection, union, difference & exclusive-or, and line & polygon offsetting.
 
+**Note**: Python 2 needs to be available for the use of *matplotlibcpp*
+
 ### 3. Usage
 
 First, clone the repository:  
