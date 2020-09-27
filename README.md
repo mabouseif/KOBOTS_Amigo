@@ -58,8 +58,24 @@ g++ -std=c++11 ../include/clipper.cpp ../include/helper_functions.cpp -I/usr/inc
 ```
 
 
-### 5. TODO
+### 5. Files
+
+- [**helper_functions.h**](./include/helper_functions.h) and [**helper_functions.cpp**](./include/helper_functions.cpp):  
+Majority of the functionality.
+
+- [**clipper.h**](./include/clipper.h) and [**clipper.cpp**](./include/clipper.cpp):  
+Clipper library.
+
+- [**matplotlibcpp.h**](./include/matplotlibcpp.h):  
+Matplotlib library.
+
+- [**demo.cpp**](./demo.cpp):  
+Demo and sandbox for experimention.
+
+
+### 6. TODO
 
 1. Direction of final line
 2. Direction indicators for visualisation
 3. Proper problem model for use of an optimization library
+4. Fix .gitignore
