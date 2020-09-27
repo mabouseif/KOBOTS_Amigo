@@ -63,7 +63,7 @@ g++ -std=c++11 ../include/clipper.cpp ../include/helper_functions.cpp -I/usr/inc
 - [**helper_functions.h**](./include/helper_functions.h) and [**helper_functions.cpp**](./include/helper_functions.cpp):  
 Majority of the functionality.
 
-- [**clipper.h**](./include/clipper.h) and [**clipper.cpp**](./include/clipper.cpp):  
+- [**clipper.hpp**](./include/clipper.h) and [**clipper.cpp**](./include/clipper.cpp):  
 Clipper library.
 
 - [**matplotlibcpp.h**](./include/matplotlibcpp.h):  
